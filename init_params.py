@@ -58,3 +58,7 @@ def env_init():
 
     if not os.path.exists('data'):
         os.mkdir('data')
+
+
+if __name__ == '__main__':
+    env_init()

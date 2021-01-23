@@ -61,7 +61,7 @@ def resolve(pred, text, labeler=None, is_sequence=False, threshold=0.7):
     if is_sequence:
         id2label = None
         if labeler:
-        id2label = {v: k for k, v in labeler}
+            id2label = {v: k for k, v in labeler}
         rst = _resolve_sequence(
             pred,
             text,
