@@ -8,12 +8,11 @@ from .data_utils import (
     sentences_loader_train,
     sequences_loader_train,
     data_generator_train,
-    data_generator_eval,
     data_generator_pred,
 )
 from .func_utils import (
     get_object,
-    trainer_init,
+    task_init,
     get_params,
     get_lines,
     get_dic_from_json,
@@ -21,6 +20,13 @@ from .func_utils import (
     kill_process,
     dump_json,
 )
+from .resolvers import resolve
+
+DIC_Resolvers = {
+    'resolver': {
+        'func': resolve
+    },
+}
 
 DIC_DataLoaders = {
     'sentences_loader_train': {
@@ -42,8 +48,8 @@ DIC_DataLoaders = {
     }
 }
 
-DIC_Generators = {
-    'data_generator_train': {
+DIC_Generators_for_train = {
+    'data_generator_for_train': {
         'func': data_generator_train,
         'params': {
             'data': None,
@@ -54,8 +60,11 @@ DIC_Generators = {
             'labeler': None,
             'activation': 'sigmoid',
         },
-    },
-    'data_generator_pred': {
+    }
+}
+
+DIC_Generators_for_pred = {
+    'data_generator_for_pred': {
         'func': data_generator_pred,
     }
 }

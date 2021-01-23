@@ -57,6 +57,7 @@ def data_generator_train(
     batch_size=128,
     labeler=None,
     activation='sigmoid',
+    is_sequence=False,
 ):
     while True:
         page_list = list(range((len(data) // batch_size)))
@@ -81,7 +82,7 @@ def data_generator_train(
             X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
             X_seg = keras.preprocessing.sequence.pad_sequences(X_seg, value=0, padding='post', maxlen=ML)
 
-            if labeler:
+            if labeler and is_sequence:
                 Y = [['O'] + y[:ML - 1] if len(y) > ML - 1 else y for y in Y]
                 Y = [['O'] + y + ['O'] * (ML - 1 - len(y)) if len(y) < ML - 1 else y for y in Y]
                 Y = [[labeler.get(l) for l in y] for y in Y]
@@ -95,53 +96,20 @@ def data_generator_train(
             yield ([X, X_seg], Y)
 
 
-def data_generator_eval(
-    X=None,
-    Y=None,
-    tokenizer=None,
-    dim=2,
-    maxlen=512,
-    ML=512,
-    batch_size=128,
-    labeler=None,
-    activation='sigmoid',
-):
-    X, X_seg = [], []
-    for d in tqdm.tqdm(X):
-        x, x_seg = tokenizer.encode(
-            first=d[0][:maxlen],
-            second=d[1][:maxlen] if d[1] else None,
-        )
-        X.append(x)
-        X_seg.append(x_seg)
-
-    X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
-    X_seg = keras.preprocessing.sequence.pad_sequences(X_seg, value=0, padding='post', maxlen=ML)
-
-    if labeler:
-        Y = [['O'] + y[:ML - 1] if len(y) > ML - 1 else y for y in Y]
-        Y = [['O'] + y + ['O'] * (ML - 1 - len(y)) if len(y) < ML - 1 else y for y in Y]
-        Y = [[labeler.get(l) for l in y] for y in Y]
-        Y = keras.preprocessing.sequence.pad_sequences(Y, maxlen=ML, value=0, padding='post')
-    else:
-        Y = np.array(Y)
-
-    if activation in ['softmax', 'crf']:
-        Y = keras.utils.to_categorical(Y, num_classes=dim)
-
-    return [X, X_seg], Y
-
-
 def data_generator_pred(
     data=None,
     tokenizer=None,
     maxlen=512,
     ML=512,
 ):
-    X, X_seg = tokenizer.encode(
-        first=data[0][:maxlen],
-        second=data[1][:maxlen] if data[1] else None,
-    )
+    X, X_seg = [], []
+    for d in data:
+        x, x_seg = tokenizer.encode(
+            first=d[0][:maxlen],
+            second=d[1][:maxlen] if len(data) == 2 else None,
+        )
+        X.append(x)
+        X_seg.append(x_seg)
 
     X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
     X_seg = keras.preprocessing.sequence.pad_sequences(X_seg, value=0, padding='post', maxlen=ML)

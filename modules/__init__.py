@@ -96,5 +96,5 @@ DIC_Optimizers = {
 
 DIC_Tokenizers = {
     'tokenizer_zh': {'func': tokenizer_zh, 'params': {'fn_vocab': None}},
-    'kwr_labeler': {'func': kwr_labeler},
+    # 'kwr_labeler': {'func': kwr_labeler},
 }

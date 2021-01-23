@@ -7,13 +7,17 @@ import os
 import json
 import streamlit as st
 
+from init_params import env_init
 from utils import dump_json
 from gui import (
     model_params,
     training_data_params,
     training_params,
+    predict_params,
     TrainingGUI,
 )
+
+env_init()
 
 task_path = None
 fn_model = None
@@ -67,10 +71,7 @@ if task_path:
             st.warning('Model weights not found, please train the model first.')
 
     if action == 'Predictor params':
-        dump_json(
-            f'{task_path}/params_pred.json',
-            {
-                'data_util': 'data_generator_pred',
-                'fn_weights': f'{task_path}/model.h5',
-            }
-        )
+        if os.path.exists(f'{task_path}/model.h5'):
+            predict_params(task_path)
+        else:
+            st.warning('Model weights not found, please train the model first.')

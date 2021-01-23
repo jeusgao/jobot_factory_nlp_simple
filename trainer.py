@@ -22,9 +22,8 @@ from builders import model_builder, train_data_builder
 from utils import (
     TrainingCallbacks,
     EvaluatingCallbacks,
-    DIC_Generators,
-    data_generator_eval,
-    trainer_init,
+    DIC_Generators_for_train,
+    task_init,
 )
 
 
@@ -48,14 +47,10 @@ def main(
     fn_weights = fn_model if is_eval else params_train.get('checkpoint')
 
     labeler = None
-
     if fn_labeler:
         fn_labeler = f'{target_path}/{fn_labeler}'
-        labeler = {}
         if os.path.exists(fn_labeler):
             labeler = pickle.load(open(fn_labeler, 'rb'))
-        dic_labeler = DIC_Tokenizers.get('kwr_labeler')
-        labeler = dic_labeler.get('func')(labeler=labeler, y_data=train_y + valid_y)
 
     tokenizer, model = model_builder(**params_model)
 
@@ -66,7 +61,7 @@ def main(
         with redirect_stdout(f):
             model.summary()
 
-    data_generator = DIC_Generators.get(params_data.get('data_generator')).get('func')
+    data_generator = DIC_Generators_for_train.get(params_data.get('data_generator_for_train')).get('func')
     dim = len(labeler) if labeler else 2
 
     if is_eval:
@@ -89,7 +84,7 @@ def main(
             activation=activation,
         )
 
-        hist = model.evaluate(
+        model.evaluate(
             test_D,
             verbose=1,
             steps=test_steps,
@@ -97,7 +92,6 @@ def main(
                 evaluate_callacks,
             ],
         )
-        return hist
 
     else:
 
@@ -146,7 +140,7 @@ def main(
         early_stopping = keras.callbacks.EarlyStopping(**params_train.get('early_stopping'))
         train_callbacks = TrainingCallbacks(task_path=target_path)
 
-        hist = model.fit(
+        model.fit(
             train_D,
             steps_per_epoch=train_steps,
             epochs=params_train.get('epochs'),
@@ -159,7 +153,6 @@ def main(
                 train_callbacks,
             ],
         )
-        return hist
 
 
 if __name__ == '__main__':
@@ -171,7 +164,7 @@ if __name__ == '__main__':
     target_path = args.path
     action = args.action
 
-    fn_model, params_model, params_data, params_train = trainer_init(target_path)
+    fn_model, params_model, params_data, params_train, _ = task_init(target_path)
 
     main(
         fn_model,

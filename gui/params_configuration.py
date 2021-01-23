@@ -20,7 +20,8 @@ from .components import (
 _dics = get_dic_from_json('params_templates.json')
 
 DIC_DataLoaders = _dics.get('DIC_DataLoaders')
-DIC_Generators = _dics.get('DIC_Generators')
+DIC_Generators_for_train = _dics.get('DIC_Generators_for_train')
+DIC_Generators_for_pred = _dics.get('DIC_Generators_for_pred')
 DIC_Layers = _dics.get('DIC_Layers')
 DIC_Losses = _dics.get('DIC_Losses')
 DIC_Metrics = _dics.get('DIC_Metrics')
@@ -36,7 +37,7 @@ def model_params(task_path, is_training=False):
     _model_params = get_dic_from_json(f'{task_path}/params_model.json')
     _dic = {}
 
-    titles = [st.title('Model params'), st.success('Base params'), st.subheader('Learning rate')]
+    titles = [st.title('Model params'), st.info('Base params'), st.subheader('Learning rate')]
 
     _dic['LR'] = float(
         st.text_input('', _model_params.get('LR') if _model_params else '2e-5')
@@ -80,7 +81,7 @@ def model_params(task_path, is_training=False):
     _dic['tokenizer_code'] = st.selectbox('tokenizer', _options, _options.index(_default))
     _dic['tokenizer_params'] = {'fn_vocab': f'hub/bases/{_base_path}/vocab.txt'}
 
-    st.success('Model params:')
+    st.info('Model params:')
 
     _dic_model = {}
 
@@ -125,7 +126,7 @@ def training_data_params(task_path, is_training=False):
     _training_data_params = get_dic_from_json(f'{task_path}/params_data.json')
     _dic_data = {}
 
-    titles = [st.title('Training data params'), st.success('Data loader params')]
+    titles = [st.title('Training data params'), st.info('Data loader params')]
 
     _options, _default, _params = get_default_params(
         _training_data_params, DIC_DataLoaders, 'data_loader_params')
@@ -137,7 +138,7 @@ def training_data_params(task_path, is_training=False):
     _data_cls = _dic_data.get("data_loader_params").get("params").get("data_cls")
 
     if _dir_data and _data_cls:
-        st.success('Training data set params')
+        st.info('Training data set params')
         _options = glob.glob(f'{_dir_data}/{_data_cls}/*.*')
 
         _default = get_default_input(None, _training_data_params, 'fns_train')
@@ -152,11 +153,19 @@ def training_data_params(task_path, is_training=False):
         _dic_data = multi_options(task_path, 'fns_test', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
 
-    st.success('Data generator params')
-    _options, _default = get_default(
-        _training_data_params, DIC_Generators, 'data_generator', is_num=True)
-    _dic_data['data_generator'] = st.selectbox('data_generator', _options, index=_default)
+    # st.info('Data generator params')
+    # _options, _default = get_default(
+    #     _training_data_params, DIC_Generators_for_train, 'data_generator_for_train', is_num=True)
+    # _dic_data['data_generator_for_train'] = st.selectbox('data_generator_for_train', _options, index=_default)
 
+    # _options, _default = get_default(
+    #     _training_data_params, DIC_Generators_for_pred, 'data_generator_for_pred', is_num=True)
+    # _dic_data['data_generator_for_pred'] = st.selectbox('data_generator_for_pred', _options, index=_default)
+
+    _dic_data['data_generator_for_train'] = 'data_generator_for_train'
+    _dic_data['data_generator_for_pred'] = 'data_generator_for_pred'
+
+    st.info('...')
     _default = get_default_input(64, _training_data_params, 'batch_size')
     _dic_data['batch_size'] = st.number_input(
         'training batch size:', min_value=16, max_value=512, value=_default, step=16)
@@ -165,11 +174,14 @@ def training_data_params(task_path, is_training=False):
     _dic_data['activation'] = st.text_input('output dense activation:', _default)
 
     _default = get_default_input('', _training_data_params, 'fn_labeler')
-    _fn_labeler = st.text_input('labeler file path:', _default).strip()
+    _fn_labeler = st.text_input('labeler filename(should be a pickle file):', _default).strip()
 
     if not len(_fn_labeler) or _fn_labeler == 'None':
         _fn_labeler = None
     _dic_data['fn_labeler'] = _fn_labeler
+
+    _default = get_default_input(0, _training_data_params, 'is_sequence')
+    _dic_data['is_sequence'] = st.radio('is sequence task?', [True, False], index=[True, False].index(_default))
 
     if not is_training and st.button('save'):
         dump_json(f'{task_path}/params_data.json', _dic_data)
@@ -218,3 +230,15 @@ def training_params(task_path, is_training=False):
     if not is_training and st.button('save'):
         dump_json(f'{task_path}/params_train.json', _dic_train)
         st.success('Params saved.')
+
+
+def predict_params(task_path):
+    _predict_params = get_dic_from_json(f'{task_path}/params_pred.json')
+    _dic_pred = {}
+
+    titles = [st.title('Predict params')]
+
+    _dic_pred['resolver'] = 'resolver'
+
+    dump_json(f'{task_path}/params_pred.json', _dic_pred)
+    st.success('Params saved.')

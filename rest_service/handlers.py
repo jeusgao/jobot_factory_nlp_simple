@@ -5,10 +5,14 @@
 import os
 from fastapi import FastAPI
 
+from predictor import main
+
 app = FastAPI()
 
 
-@app.post("/qqp_predict/")
-async def qqp_pred(text1: str, text1: str):
-    rst = None
+@app.get("/pred/{api_name}")
+async def pred(api_name, inputs):
+
+    rst = main(api_name, inputs)
+
     return {'result': rst}

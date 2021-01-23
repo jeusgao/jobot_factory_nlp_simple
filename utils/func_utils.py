@@ -11,10 +11,11 @@ def get_object(func=None, params=None):
     return func(**params) if params else func()
 
 
-def trainer_init(task_path):
-    pid = os.getpid()
-    with open(f'{task_path}/training.pid', 'w') as f:
-        f.write(pid.__str__())
+def task_init(task_path, is_train=True):
+    if is_train:
+        pid = os.getpid()
+        with open(f'{task_path}/training.pid', 'w') as f:
+            f.write(pid.__str__())
 
     fn_model = f'{task_path}/model.h5'
 
@@ -27,7 +28,10 @@ def trainer_init(task_path):
     with open(f'{task_path}/params_train.json') as f:
         params_train = json.load(f)
 
-    return fn_model, params_model, params_data, params_train
+    with open(f'{task_path}/params_pred.json') as f:
+        params_pred = json.load(f)
+
+    return fn_model, params_model, params_data, params_train, params_pred
 
 
 def get_params(fn):
