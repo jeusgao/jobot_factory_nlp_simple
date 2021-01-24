@@ -12,6 +12,7 @@ open localhost:PORT with a broswer ...
 ## Rest service:
 * uvicorn rest_service.handlers:app --port=REST_SERVER-PORT or python3 rest_server.py -p=REST_SERVER-PORT
 
+# ENV
 python >= 3.6
  and test with tf 2.4.0
 
