@@ -31,6 +31,7 @@ class Predictor(object):
         self.resolver = DIC_Resolvers.get(params_pred.get('resolver')).get('func')
 
         self.tokenizer, self.model = model_builder(**params_model)
+        # self.model.summary()
         self.model.load_weights(fn_model)
 
     def predict(self, inputs):
@@ -49,7 +50,7 @@ class Predictor(object):
 models = tuple(os.walk('hub/models'))[0][1]
 
 DIC_Predictors = {
-    k: Predictor(k) for k in models
+    k: Predictor(k) for k in models if os.path.exists(f'hub/models/{k}/model.h5')
 }
 
 

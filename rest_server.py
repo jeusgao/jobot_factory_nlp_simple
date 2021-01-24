@@ -8,9 +8,10 @@ import argparse
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="args of trainer")
-    parser.add_argument("-p", "--port", type=int, default=9060)
-    parser.add_argument("-r", "--reload", type=int, default=0)
+    parser = argparse.ArgumentParser(description="args of rest service")
+    parser.add_argument("--host", default='127.0.0.1')
+    parser.add_argument("-p", "--port", type=int, default=9055)
+    parser.add_argument("-r", "--reload", type=int, default=1)
     args = parser.parse_args()
 
-    uvicorn.run('rest_service.handlers:app', port=args.port, reload=args.reload == 1)
+    uvicorn.run('rest_service.handlers:app', host=args.host, port=args.port, reload=args.reload == 1)
