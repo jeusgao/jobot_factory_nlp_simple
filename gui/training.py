@@ -32,9 +32,11 @@ class TrainingGUI(object):
             os.path.exists(f'{task_path}/params_model.json'),
             os.path.exists(f'{task_path}/params_data.json'),
             os.path.exists(f'{task_path}/params_train.json'),
+            os.path.exists(f'{task_path}/params_pred.json'),
         ])
         self.task_path = task_path
         self.is_eval = is_eval
+        self.is_model_structure_showed = False
 
         st.title(f'Task {task_path.split("/")[-1]} {self._action}...')
 
@@ -91,7 +93,9 @@ class TrainingGUI(object):
             st.success(f'{self._action.capitalize()} accomplished.')
 
         st.info(f'Model layers')
-        st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+        if not self.is_model_structure_showed:
+            st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+            self.is_model_structure_showed = True
 
     def _start_training(self):
         _block = st.empty()
@@ -158,4 +162,6 @@ class TrainingGUI(object):
                         is_running=_state,
                     )
                     st.info(f'Model layers')
-                    st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+                    if not self.is_model_structure_showed:
+                        st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+                        self.is_model_structure_showed = True

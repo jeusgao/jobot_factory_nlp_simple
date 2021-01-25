@@ -128,13 +128,40 @@ def training_data_params(task_path, is_training=False):
 
     titles = [st.title('Training data params'), st.info('Data loader params')]
 
+    st.write('Select a data loader')
     _options, _default, _params = get_default_params(
         _training_data_params, DIC_DataLoaders, 'data_loader_params')
-    _dic_data = single_option(
-        'data_loader_params', DIC_DataLoaders, _dic_data, _options,
-        _params=_params, _index=_options.index(_default))
 
-    _dir_data = _dic_data.get("data_loader_params").get("params").get("dir_data")
+    _index = _options.index(_default)
+    _option = st.selectbox('', _options, index=_index)
+    if not _params:
+        _params = DIC_DataLoaders.get(_option).get('params')
+    if _params:
+        _params_new = {}
+        _params_new['data'] = 'data'
+
+        _options = tuple(os.walk('data/'))[0][1]
+        _default = _options.index(_params.get('data_cls')) if _params.get('data_cls') else 0
+        _params_new['data_cls'] = st.selectbox('Select a data set', _options, _default).split('/')[-1]
+
+        if 't1' in _params:
+            _params_new['t1'] = st.text_input('Column name of first text', _params.get('t1'))
+        if 't2' in _params:
+            _params_new['t2'] = st.text_input('Column name of second text', _params.get('t2'))
+        if 'label' in _params:
+            _params_new['label'] = st.text_input('Column name of sentence label', _params.get('label'))
+        DIC_DataLoaders[_option]['params'] = _params_new
+        _dic_data['data_loader_params'] = {'func': _option, 'params': _params_new}
+    else:
+        st.write(f'{_option}: None params')
+        _dic_data['data_loader_params'] = {'func': _option}
+
+    # _dic_data = single_option(
+    #     'data_loader_params', DIC_DataLoaders, _dic_data, _options,
+    #     _params=_params, _index=_options.index(_default))
+
+    # _dir_data = _dic_data.get("data_loader_params").get("params").get("dir_data")
+    _dir_data = 'data'
     _data_cls = _dic_data.get("data_loader_params").get("params").get("data_cls")
 
     if _dir_data and _data_cls:
@@ -232,7 +259,7 @@ def training_params(task_path, is_training=False):
         st.success('Params saved.')
 
 
-def predict_params(task_path):
+def predict_params(task_path, is_training=False):
     _predict_params = get_dic_from_json(f'{task_path}/params_pred.json')
     _dic_pred = {}
 
@@ -243,5 +270,6 @@ def predict_params(task_path):
 
     _dic_pred['resolver'] = 'resolver'
 
-    dump_json(f'{task_path}/params_pred.json', _dic_pred)
-    st.success('Params saved.')
+    if not is_training and st.button('save'):
+        dump_json(f'{task_path}/params_pred.json', _dic_pred)
+        st.success('Params saved.')
