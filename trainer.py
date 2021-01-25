@@ -19,6 +19,7 @@ from tensorflow import keras
 from contextlib import redirect_stdout
 
 from builders import model_builder, train_data_builder
+from modules import DIC_Labelers
 from utils import (
     TrainingCallbacks,
     EvaluatingCallbacks,
@@ -41,6 +42,7 @@ def main(
     batch_size = params_data.get('batch_size')
     activation = params_data.get('activation')
     fn_labeler = params_data.get('fn_labeler')
+    is_sequence = params_data.get('is_sequence')
 
     is_eval = action == 'evaluating'
 
@@ -64,13 +66,14 @@ def main(
     data_generator = DIC_Generators_for_train.get(params_data.get('data_generator_for_train')).get('func')
     dim = len(labeler) if labeler else 2
 
+    test_x, test_y, test_steps = train_data_builder(
+        data_loader_params=params_data.get('data_loader_params'),
+        fns=params_data.get('fns_test'),
+        batch_size=batch_size,
+    )
+
     if is_eval:
         evaluate_callacks = EvaluatingCallbacks(task_path=target_path, log_name=action)
-        test_x, test_y, test_steps = train_data_builder(
-            data_loader_params=params_data.get('data_loader_params'),
-            fns=params_data.get('fns_test'),
-            batch_size=batch_size,
-        )
 
         test_D = data_generator(
             data=test_x,
@@ -105,6 +108,12 @@ def main(
             fns=params_data.get('fns_dev'),
             batch_size=batch_size,
         )
+
+        if fn_labeler and is_sequence:
+            func = DIC_Labelers.get('kwr_labeler').get('func')
+            labeler = func(labeler=labeler, y_data=train_y + valid_y + test_y)
+            pickle.dump(labeler, open(fn_labeler, 'wb'))
+
         total_steps, warmup_steps = calc_train_steps(
             num_example=len(train_x),
             batch_size=batch_size,

@@ -38,6 +38,5 @@ def kwr_labeler(labeler=None, y_data=None):
             for y in seq:
                 if y not in labeler:
                     labeler[y] = len(labeler)
-        # pickle.dump(labeler, open(fn_labeler, 'wb'))
 
     return labeler

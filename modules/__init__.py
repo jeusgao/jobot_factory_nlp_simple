@@ -59,7 +59,7 @@ DIC_Layers = {
     'bigru': {'func': bi_gru, 'params': {'units': 64, 'return_sequences': True, 'reset_after': True}},
     'dropout': {'func': dropout, 'params': {'rate': 0.1}},
     'crf': {'func': crf},
-    'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D,'params':{'name':'Masked-Global-Pool-Max'}},
+    'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D, 'params': {'name': 'Masked-Global-Pool-Max'}},
 }
 
 DIC_Bases = {
@@ -96,5 +96,8 @@ DIC_Optimizers = {
 
 DIC_Tokenizers = {
     'tokenizer_zh': {'func': tokenizer_zh, 'params': {'fn_vocab': None}},
-    # 'kwr_labeler': {'func': kwr_labeler},
+}
+
+DIC_Labelers = {
+    'kwr_labeler': {'func': kwr_labeler},
 }

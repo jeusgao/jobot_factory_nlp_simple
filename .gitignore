@@ -1,11 +1,5 @@
 celery/
-data/ownthink_v2.csv
-data/kwr/example.train
-data/kwr/example.dev
-data/qqp/train_lcqmc.tsv
-data/qqp/dev_lcqmc.tsv
-data/qqp/train_afqmc.tsv
-data/qqp/dev_afqmc.tsv
+data/
 env/
 hub/
 load_ttl.py

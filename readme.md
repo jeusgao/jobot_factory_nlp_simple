@@ -1,4 +1,4 @@
-A light tool for TF Model building/training/evaluating for simple nlp task just by params configuration, training/evaluating monitor and params configure GUI with streamlit.
+A light tool for TF Model building/training/evaluating for simple nlp tasks just by params configuration, training/evaluating monitor and params configure GUI with streamlit.
 
 copy pretrained LM into hub/bases/ (bert, rbt, albert ...)
 
