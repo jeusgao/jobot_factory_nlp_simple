@@ -68,9 +68,10 @@ def resolve(pred, text, labeler=None, is_sequence=False, threshold=0.7):
             id2label=id2label,
         )
     else:
-        pred = numpy.asarray(pred).reshape(-1)
-        rst = [1 if sim > threshold else 0 for sim in pred]
+        rst = int(pred.argmax(-1)[0])
+        score = float(np.asarray(pred).reshape(-1)[rst])
+        # rst = [1 if sim > threshold else 0 for sim in pred]
         if labeler:
             rst = labeler.get(rst, 0)
 
-    return rst
+    return {'result': rst, 'score': score}

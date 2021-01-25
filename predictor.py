@@ -35,15 +35,15 @@ class Predictor(object):
         self.model.load_weights(fn_model)
 
     def predict(self, inputs):
-        data = inputs if is_sequence else [inputs]
+        # data = inputs if self.is_sequence else [inputs]
         data_input = self.data_generator(
-            data=data,
+            data=inputs,
             tokenizer=self.tokenizer,
             maxlen=self.maxlen,
             ML=self.ML,
         )
         pred = self.model.predict(data_input)
-        rst = self.resolver(pred, data, labeler=self.labeler, is_sequence=self.is_sequence)
+        rst = self.resolver(pred, inputs, labeler=self.labeler, is_sequence=self.is_sequence)
         return rst
 
 
@@ -54,8 +54,12 @@ DIC_Predictors = {
 }
 
 
-def main(api_name, inputs):
+def main(api_name: str, input1: str, input2: str=None):
+    inputs = [input1]
+    if input2:
+        inputs.append(input2)
     predictor = DIC_Predictors.get(api_name)
     rst = predictor.predict(inputs)
+    print('+++++', rst)
 
     return rst

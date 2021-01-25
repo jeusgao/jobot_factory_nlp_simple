@@ -1,10 +1,8 @@
-celery
 fastapi
 keras-bert
 keras-metrics
 numpy
 pandas
-redis
 sklearn
 tensorflow_addons
 tqdm

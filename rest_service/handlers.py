@@ -11,8 +11,8 @@ app = FastAPI()
 
 
 @app.get("/pred/{api_name}")
-async def pred(api_name, inputs):
+def pred(api_name: str, input1: str, input2: str=None):
 
-    rst = main(api_name, inputs)
+    rst = main(api_name, input1, input2)
 
-    return {'result': rst}
+    return rst

@@ -1,0 +1,12 @@
+celery
+fastapi
+keras-bert
+keras-metrics
+numpy
+pandas
+redis
+sklearn
+streamlit
+tensorflow_addons
+tqdm
+uvicorn
