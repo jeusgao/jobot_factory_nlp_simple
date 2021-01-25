@@ -39,9 +39,9 @@ def model_params(task_path, is_training=False):
 
     titles = [st.title('Model params'), st.info('Base params'), st.subheader('Learning rate')]
 
-    _dic['LR'] = float(
-        st.text_input('', _model_params.get('LR') if _model_params else '2e-5')
-    )
+    # _dic['LR'] = float(
+    #     st.text_input('', _model_params.get('LR') if _model_params else '2e-5')
+    # )
 
     st.subheader('Max lenth')
     maxlen = st.number_input(
@@ -237,6 +237,9 @@ def predict_params(task_path):
     _dic_pred = {}
 
     titles = [st.title('Predict params')]
+
+    _default = get_default_input(None, _predict_params, 'threshold')
+    _dic_pred['threshold'] = st.text_input('Score metric threshold:', _default).strip()
 
     _dic_pred['resolver'] = 'resolver'
 

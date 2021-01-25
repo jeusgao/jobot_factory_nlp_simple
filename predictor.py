@@ -18,6 +18,7 @@ class Predictor(object):
         self.labeler, self.tokenizer, self.model = None, None, None
         self.maxlen = params_model.get('maxlen')
         self.ML = params_model.get('ML')
+        self.activation = params_data.get('activation')
 
         self.is_sequence = params_data.get('is_sequence')
 
@@ -43,7 +44,7 @@ class Predictor(object):
             ML=self.ML,
         )
         pred = self.model.predict(data_input)
-        rst = self.resolver(pred, inputs, labeler=self.labeler, is_sequence=self.is_sequence)
+        rst = self.resolver(pred, inputs, activation=self.activation, labeler=self.labeler, is_sequence=self.is_sequence)
         return rst
 
 
@@ -54,12 +55,11 @@ DIC_Predictors = {
 }
 
 
-def main(api_name: str, input1: str, input2: str=None):
+def main(api_name, input1, input2=None):
     inputs = [input1]
     if input2:
         inputs.append(input2)
     predictor = DIC_Predictors.get(api_name)
-    rst = predictor.predict(inputs)
-    print('+++++', rst)
+    rst = predictor.predict([inputs])
 
     return rst

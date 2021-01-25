@@ -20,7 +20,7 @@ from modules import (
 
 
 def model_builder(
-    LR=2e-5,
+    # LR=2e-5,
     maxlen=64,
     ML=64,
     tokenizer_code='tokenizer_zh',

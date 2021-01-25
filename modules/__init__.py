@@ -59,7 +59,7 @@ DIC_Layers = {
     'bigru': {'func': bi_gru, 'params': {'units': 64, 'return_sequences': True, 'reset_after': True}},
     'dropout': {'func': dropout, 'params': {'rate': 0.1}},
     'crf': {'func': crf},
-    'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D},
+    'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D,'params':{'name':'Masked-Global-Pool-Max'}},
 }
 
 DIC_Bases = {

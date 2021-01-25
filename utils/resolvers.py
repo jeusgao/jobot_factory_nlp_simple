@@ -56,7 +56,7 @@ def _resolve_sequence(
     return rst_ner
 
 
-def resolve(pred, text, labeler=None, is_sequence=False, threshold=0.7):
+def resolve(pred, text, activation='sigmoid', labeler=None, is_sequence=False, threshold=0.7):
     rst = None
     if is_sequence:
         id2label = None
@@ -68,9 +68,13 @@ def resolve(pred, text, labeler=None, is_sequence=False, threshold=0.7):
             id2label=id2label,
         )
     else:
-        rst = int(pred.argmax(-1)[0])
-        score = float(np.asarray(pred).reshape(-1)[rst])
-        # rst = [1 if sim > threshold else 0 for sim in pred]
+        if activation == 'sigmoid':
+            pred = np.asarray(pred).reshape(-1)
+            rst = 0 if pred[0] < threshold else 1
+            score = float(pred[0])
+        else:
+            rst = int(pred.argmax(-1)[0])
+            score = float(np.asarray(pred).reshape(-1)[rst])
         if labeler:
             rst = labeler.get(rst, 0)
 
