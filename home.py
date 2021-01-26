@@ -90,10 +90,13 @@ def _task_management(task_path):
             st.warning('Model weights not found, please train the model first.')
 
     if action == f'Remove task {task_path}':
-        block_title = st.title(f'Are you sure remove task {task_path}?')
-        block_remove = st.empty()
-        block_cancel = st.empty()
-        _remove_task(task_path, block_title, block_remove, block_cancel)
+        if is_running:
+            st.warning('Cannot remove task when task training is running ...')
+        else:
+            block_title = st.title(f'Are you sure remove task {task_path}?')
+            block_remove = st.empty()
+            block_cancel = st.empty()
+            _remove_task(task_path, block_title, block_remove, block_cancel)
 
 
 task_action = st.sidebar.radio('', ['New task', 'Select task from exists'])

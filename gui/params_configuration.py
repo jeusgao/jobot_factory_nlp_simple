@@ -54,11 +54,11 @@ def model_params(task_path, is_training=False):
     _dic['maxlen'] = maxlen
 
     _is_pair = True
-    if _model_params and _model_params.get('ML') == _model_params.get('maxlen'):
+    if _model_params and _model_params.get('ML') == _model_params.get('maxlen') + 2:
         _is_pair = False
 
     is_pair = st.radio('is pair inputs', [True, False], [True, False].index(_is_pair))
-    _dic['ML'] = maxlen * 2 + 3 if is_pair else maxlen
+    _dic['ML'] = maxlen * 2 + 3 if is_pair else maxlen + 2
 
     st.subheader('Pretrained base model')
     _options, _default = get_default(_model_params, DIC_Bases, 'base_code')
@@ -127,20 +127,21 @@ def training_data_params(task_path, is_training=False):
     _dic_data = {}
 
     titles = [st.title('Training data params'), st.info('Data loader params')]
+    _dir_data = 'data'
 
-    st.write('Select a data loader')
+    # st.write('Select a data loader')
     _options, _default, _params = get_default_params(
         _training_data_params, DIC_DataLoaders, 'data_loader_params')
 
     _index = _options.index(_default)
-    _option = st.selectbox('', _options, index=_index)
+    _option = st.selectbox('Select a data loader', _options, index=_index)
     if not _params:
         _params = DIC_DataLoaders.get(_option).get('params')
+    _params_new = {}
     if _params:
-        _params_new = {}
-        _params_new['data'] = 'data'
+        _params_new['dir_data'] = _dir_data
 
-        _options = tuple(os.walk('data/'))[0][1]
+        _options = tuple(os.walk(f'{_dir_data}/'))[0][1]
         _default = _options.index(_params.get('data_cls')) if _params.get('data_cls') else 0
         _params_new['data_cls'] = st.selectbox('Select a data set', _options, _default).split('/')[-1]
 
@@ -156,27 +157,26 @@ def training_data_params(task_path, is_training=False):
         st.write(f'{_option}: None params')
         _dic_data['data_loader_params'] = {'func': _option}
 
-    # _dic_data = single_option(
-    #     'data_loader_params', DIC_DataLoaders, _dic_data, _options,
-    #     _params=_params, _index=_options.index(_default))
-
-    # _dir_data = _dic_data.get("data_loader_params").get("params").get("dir_data")
-    _dir_data = 'data'
-    _data_cls = _dic_data.get("data_loader_params").get("params").get("data_cls")
-
-    if _dir_data and _data_cls:
+    _data_cls = _params_new.get("data_cls")
+    if _data_cls:
         st.info('Training data set params')
         _options = glob.glob(f'{_dir_data}/{_data_cls}/*.*')
 
         _default = get_default_input(None, _training_data_params, 'fns_train')
+        if not set(_options).intersection(set(_default)):
+            _default = None
         _dic_data = multi_options(task_path, 'fns_train', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
 
         _default = get_default_input(None, _training_data_params, 'fns_dev')
+        if not set(_options).intersection(set(_default)):
+            _default = None
         _dic_data = multi_options(task_path, 'fns_dev', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
 
         _default = get_default_input(None, _training_data_params, 'fns_test')
+        if not set(_options).intersection(set(_default)):
+            _default = None
         _dic_data = multi_options(task_path, 'fns_test', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
 

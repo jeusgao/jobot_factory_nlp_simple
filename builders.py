@@ -49,9 +49,12 @@ def model_builder(
     output = base.output
 
     for layer in cfg_model.layers:
-        output = get_object(
-            func=DIC_Layers.get(layer.get('func')).get('func'),
-            params=layer.get('params'))(output)
+        if 'params' in layer:
+            output = get_object(
+                func=DIC_Layers.get(layer.get('func')).get('func'),
+                params=layer.get('params'))(output)
+        else:
+            output = DIC_Layers.get(layer.get('func')).get('func')(output)
     model = keras.Model(inputs, output)
 
     _loss = cfg_model.loss

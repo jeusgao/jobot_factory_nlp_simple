@@ -87,6 +87,7 @@ def multi_options(task_path, tag, options, main_dic, _default=None, fn=None, is_
                 _params = eval(st.text_input(f'{key} params:', _params.get('params'), key=f'{tag}_{key}_params_{i}'))
             else:
                 st.write(f'{key}: None param')
+                _params = None
 
             if _params:
                 tmp = {'func': key, 'params': _params}

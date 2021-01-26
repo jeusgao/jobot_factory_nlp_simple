@@ -3,20 +3,20 @@
 # @Date    : 2021-01-07 13:10:57
 # @Author  : Joe Gao (jeusgao@163.com)
 
+import tensorflow as tf
+
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
 import os
 import json
 import time
 import pickle
 import argparse
 
-import tensorflow as tf
-from keras_bert import calc_train_steps
-
-physical_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
 from tensorflow import keras
 from contextlib import redirect_stdout
+from keras_bert import calc_train_steps
 
 from builders import model_builder, train_data_builder
 from modules import DIC_Labelers
@@ -53,6 +53,8 @@ def main(
         fn_labeler = f'{target_path}/{fn_labeler}'
         if os.path.exists(fn_labeler):
             labeler = pickle.load(open(fn_labeler, 'rb'))
+        else:
+            labeler = {'O': 0}
 
     tokenizer, model = model_builder(**params_model)
 
@@ -112,6 +114,7 @@ def main(
         if fn_labeler and is_sequence:
             func = DIC_Labelers.get('kwr_labeler').get('func')
             labeler = func(labeler=labeler, y_data=train_y + valid_y + test_y)
+            dim = len(labeler)
             pickle.dump(labeler, open(fn_labeler, 'wb'))
 
         total_steps, warmup_steps = calc_train_steps(
@@ -131,6 +134,7 @@ def main(
             batch_size=batch_size,
             labeler=labeler,
             activation=activation,
+            is_sequence=is_sequence,
         )
 
         valid_D = data_generator(
@@ -143,6 +147,7 @@ def main(
             batch_size=batch_size,
             labeler=labeler,
             activation=activation,
+            is_sequence=is_sequence,
         )
 
         cp_loss = keras.callbacks.ModelCheckpoint(fn_model, **params_train.get('cp_loss'))

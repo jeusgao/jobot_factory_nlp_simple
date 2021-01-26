@@ -92,8 +92,8 @@ class TrainingGUI(object):
 
             st.success(f'{self._action.capitalize()} accomplished.')
 
-        st.info(f'Model layers')
         if not self.is_model_structure_showed:
+            st.info(f'Model layers')
             st.json(get_lines(f'{self.task_path}/model_structs.txt'))
             self.is_model_structure_showed = True
 
@@ -116,8 +116,11 @@ class TrainingGUI(object):
                 )
             if self.is_eval:
                 train_graph.empty()
-        st.info(f'Model layers')
-        st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+
+        if not self.is_model_structure_showed:
+            st.info(f'Model layers')
+            st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+            self.is_model_structure_showed = True
 
     def _stop_training(self):
         task_id = get_key_from_json(f'{self.task_path}/training_task.id', 'task_id')
@@ -161,7 +164,7 @@ class TrainingGUI(object):
                         valid_graph=st.empty() if self.is_eval else st.line_chart(),
                         is_running=_state,
                     )
-                    st.info(f'Model layers')
                     if not self.is_model_structure_showed:
+                        st.info(f'Model layers')
                         st.json(get_lines(f'{self.task_path}/model_structs.txt'))
                         self.is_model_structure_showed = True
