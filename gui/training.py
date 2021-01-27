@@ -114,8 +114,8 @@ class TrainingGUI(object):
                     train_graph=st.json('') if self.is_eval else st.line_chart(),
                     valid_graph=st.empty() if self.is_eval else st.line_chart(),
                 )
-            if self.is_eval:
-                train_graph.empty()
+                if self.is_eval:
+                    valid_graph.empty()
 
         if not self.is_model_structure_showed:
             st.info(f'Model layers')

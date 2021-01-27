@@ -87,6 +87,7 @@ def main(
             batch_size=128,
             labeler=labeler,
             activation=activation,
+            is_sequence=is_sequence,
         )
 
         model.evaluate(

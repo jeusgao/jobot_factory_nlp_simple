@@ -74,7 +74,7 @@ def data_generator_train(
             for d in D:
                 x, x_seg = tokenizer.encode(
                     first=d[0][:maxlen],
-                    second=d[1][:maxlen] if d[1] else None,
+                    second=d[1][:maxlen] if len(d) == 2 else None,
                 )
                 X.append(x)
                 X_seg.append(x_seg)
