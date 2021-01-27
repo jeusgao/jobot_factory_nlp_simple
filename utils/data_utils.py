@@ -32,10 +32,13 @@ def sequences_loader_train(fns=None, dir_data=None, data_cls=None):
     data_x, data_y = [], []
     for fn in fns:
         with open(fn, 'r', encoding='utf-8') as f:
-            lines = f.read().strip().splitlines()
+            lines = f.read().splitlines()
         x, y = [], []
         for line in lines:
             row = line.split()
+            if len(row) == 1:
+                x.append(' ')
+                y.append(row[0])
             if len(row) <= 1:
                 data_x.append(x)
                 data_y.append(y)

@@ -6,6 +6,7 @@
 # @Version : $Id$
 
 import os
+import pickle
 from builders import model_builder
 from utils import DIC_Generators_for_pred, DIC_Resolvers, task_init
 

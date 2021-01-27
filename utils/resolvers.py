@@ -50,7 +50,9 @@ def _resolve_sequence(
     text,
     id2label=None,
 ):
-    _max_ner = pred[0][0].argmax(axis=-1).tolist()[1:len(text) + 1]
+    text = sum(text, [])[0]
+    print(pred[0].argmax(axis=-1).tolist()[1:len(text) + 1], text)
+    _max_ner = pred[0].argmax(axis=-1).tolist()[1:len(text) + 1]
     rst_ner = _get_label_sequence(id2label, _max_ner, text)
 
     return rst_ner
@@ -58,10 +60,11 @@ def _resolve_sequence(
 
 def resolve(pred, text, activation='sigmoid', labeler=None, is_sequence=False, threshold=0.7):
     rst = None
+    score = None
     if is_sequence:
         id2label = None
         if labeler:
-            id2label = {v: k for k, v in labeler}
+            id2label = {v: k for k, v in labeler.items()}
         rst = _resolve_sequence(
             pred,
             text,

@@ -111,6 +111,7 @@ def main(
             fns=params_data.get('fns_dev'),
             batch_size=batch_size,
         )
+        print(len(train_x), len(valid_x))
 
         if fn_labeler and is_sequence:
             func = DIC_Labelers.get('kwr_labeler').get('func')
