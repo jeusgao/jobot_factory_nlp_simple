@@ -115,7 +115,7 @@ class TrainingGUI(object):
                     valid_graph=st.empty() if self.is_eval else st.line_chart(),
                 )
                 if self.is_eval:
-                    valid_graph.empty()
+                    train_graph.empty()
 
         if not self.is_model_structure_showed:
             st.info(f'Model layers')
@@ -159,11 +159,13 @@ class TrainingGUI(object):
                     else:
                         self._monitoring()
                 else:
-                    _, _, _ = self._print_logs(
+                    _, _, train_graph = self._print_logs(
                         train_graph=st.empty() if self.is_eval else st.line_chart(),
                         valid_graph=st.empty() if self.is_eval else st.line_chart(),
                         is_running=_state,
                     )
+                    if self.is_eval:
+                        train_graph.empty()
                     if not self.is_model_structure_showed:
                         st.info(f'Model layers')
                         st.json(get_lines(f'{self.task_path}/model_structs.txt'))

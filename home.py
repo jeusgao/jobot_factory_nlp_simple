@@ -49,7 +49,7 @@ def _remove_task(task_path, block_title, block_remove, block_cancel):
     if _cancel:
         block_remove.empty()
         block_cancel.empty()
-        block_title.success(f'Action canceled.')
+        block_title.success(f'Task remove canceled.')
 
 
 def _task_management(task_path):
@@ -60,7 +60,7 @@ def _task_management(task_path):
             'Training params configuration',
             'Train the model',
             'Evaluate the model',
-            f'Remove task {task_path}',
+            f'Remove task - {task_path}',
         ]
     )
 
@@ -89,7 +89,7 @@ def _task_management(task_path):
         else:
             st.warning('Model weights not found, please train the model first.')
 
-    if action == f'Remove task {task_path}':
+    if action == f'Remove task - {task_path}':
         if is_running:
             st.warning('Cannot remove task when task training is running ...')
         else:
