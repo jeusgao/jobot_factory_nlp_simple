@@ -40,7 +40,7 @@ class TrainingGUI(object):
 
         st.title(f'Task {task_path.split("/")[-1]} {self._action}...')
 
-    def _print_logs(self, _n_curr=0, state='begin', _freq=100, train_graph=None, valid_graph=None, is_running=True):
+    def _print_logs(self, _n_curr=0, state='begin', _freq=100, train_graph=None, valid_graph=None, is_running=True, log_epoch=None, logs_graph=None):
         logs = get_lines(f'{self.task_path}/{self._action}_logs.json')
         for i, log in enumerate(logs[_n_curr:]):
             if 'EPOCH' in log:
@@ -53,17 +53,28 @@ class TrainingGUI(object):
                             for k, v in log.get('scores').items() if k.startswith('val_')
                         }
                         valid_graph.add_rows(pd.json_normalize([scores]))
-                st.json(log)
+                        st.text(f'EPOCH: {state}, Scores: {scores}')
+                log_epoch.json(log)
             else:
-                log = json.loads(log.strip())
-                if self.is_eval:
-                    if is_running:
-                        train_graph.json(log)
-                else:
-                    if log.get('batch') % _freq == 0:
-                        train_graph.add_rows(pd.json_normalize([log.get('scores')]))
+                try:
+                    log = json.loads(log.strip())
+                    if self.is_eval:
+                        if is_running:
+                            train_graph.json(log)
+                    else:
+                        if log.get('batch') % _freq == 0:
+                            train_graph.add_rows(pd.json_normalize([log.get('scores')]))
+                except:
+                    continue
+            logs_graph.json(log)
         _n_curr = len(logs)
         return _n_curr, state, train_graph
+
+    def _show_structure(self):
+        if not self.is_model_structure_showed:
+            st.info(f'Model layers')
+            st.json(get_lines(f'{self.task_path}/model_structs.txt'))
+            self.is_model_structure_showed = True
 
     def _monitoring(self):
         _block = st.empty()
@@ -76,6 +87,11 @@ class TrainingGUI(object):
 
             train_graph = st.json('') if self.is_eval else st.line_chart()
             valid_graph = st.empty() if self.is_eval else st.line_chart()
+            log_epoch = st.empty()
+            logs_graph = st.empty()
+
+            self._show_structure()
+            self.is_model_structure_showed = True
 
             state = 'begin'
             _n_curr = 0
@@ -86,16 +102,15 @@ class TrainingGUI(object):
                     _freq=_freq,
                     train_graph=train_graph,
                     valid_graph=valid_graph,
+                    log_epoch=log_epoch,
+                    logs_graph=logs_graph,
                 )
             if self.is_eval:
                 train_graph.empty()
 
             st.success(f'{self._action.capitalize()} accomplished.')
 
-        if not self.is_model_structure_showed:
-            st.info(f'Model layers')
-            st.json(get_lines(f'{self.task_path}/model_structs.txt'))
-            self.is_model_structure_showed = True
+        self._show_structure()
 
     def _start_training(self):
         _block = st.empty()
@@ -106,6 +121,11 @@ class TrainingGUI(object):
             dump_json(f'{self.task_path}/training_task.id', {'task_id': res.id})
             _block.empty()
             time.sleep(15)
+            _stop = _block.button(f'Stop {self._action}, or think twice before you click me...')
+            if _stop:
+                _block.empty()
+                self._stop_training()
+                self._start_training()
             self._monitoring()
         else:
             if os.path.exists(f'{self.task_path}/{self._action}_logs.json'):
@@ -113,14 +133,12 @@ class TrainingGUI(object):
                 _n_curr, state, train_graph = self._print_logs(
                     train_graph=st.json('') if self.is_eval else st.line_chart(),
                     valid_graph=st.empty() if self.is_eval else st.line_chart(),
+                    log_epoch=st.empty(), logs_graph=st.empty(),
                 )
                 if self.is_eval:
                     train_graph.empty()
 
-        if not self.is_model_structure_showed:
-            st.info(f'Model layers')
-            st.json(get_lines(f'{self.task_path}/model_structs.txt'))
-            self.is_model_structure_showed = True
+        self._show_structure()
 
     def _stop_training(self):
         task_id = get_key_from_json(f'{self.task_path}/training_task.id', 'task_id')
@@ -163,10 +181,9 @@ class TrainingGUI(object):
                         train_graph=st.empty() if self.is_eval else st.line_chart(),
                         valid_graph=st.empty() if self.is_eval else st.line_chart(),
                         is_running=_state,
+                        log_epoch=st.empty(), logs_graph=st.empty(),
                     )
                     if self.is_eval:
                         train_graph.empty()
-                    if not self.is_model_structure_showed:
-                        st.info(f'Model layers')
-                        st.json(get_lines(f'{self.task_path}/model_structs.txt'))
-                        self.is_model_structure_showed = True
+
+                    self._show_structure()
