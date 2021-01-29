@@ -77,12 +77,19 @@ def multi_options(task_path, tag, options, main_dic, _default=None, fn=None, is_
             f.write('\n'.join(filter(None, _keys)))
 
     if is_params:
+        _ori_funcs = main_dic.get(tag)
         tmps = []
         for i, key in enumerate(_keys):
             if not key:
                 continue
 
             _params = tpl_dic.get(key) if tpl_dic else None
+
+            if _ori_funcs and len(_ori_funcs):
+                if i < len(_ori_funcs) and _ori_funcs[i].get('func'):
+                    if _ori_funcs[i].get('func') == key:
+                        _params = _ori_funcs[i]
+
             if _params and _params.get('params'):
                 _params = eval(st.text_input(f'{key} params:', _params.get('params'), key=f'{tag}_{key}_params_{i}'))
             else:

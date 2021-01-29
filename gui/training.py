@@ -54,7 +54,8 @@ class TrainingGUI(object):
                         }
                         valid_graph.add_rows(pd.json_normalize([scores]))
                         st.text(f'EPOCH: {state}, Scores: {scores}')
-                log_epoch.json(log)
+                if log_epoch:
+                    log_epoch.json(log)
             else:
                 try:
                     log = json.loads(log.strip())
@@ -91,7 +92,6 @@ class TrainingGUI(object):
             logs_graph = st.empty()
 
             self._show_structure()
-            self.is_model_structure_showed = True
 
             state = 'begin'
             _n_curr = 0
@@ -105,6 +105,7 @@ class TrainingGUI(object):
                     log_epoch=log_epoch,
                     logs_graph=logs_graph,
                 )
+            log_epoch.empty()
             if self.is_eval:
                 train_graph.empty()
 
@@ -133,7 +134,7 @@ class TrainingGUI(object):
                 _n_curr, state, train_graph = self._print_logs(
                     train_graph=st.json('') if self.is_eval else st.line_chart(),
                     valid_graph=st.empty() if self.is_eval else st.line_chart(),
-                    log_epoch=st.empty(), logs_graph=st.empty(),
+                    logs_graph=st.empty(),
                 )
                 if self.is_eval:
                     train_graph.empty()
@@ -181,7 +182,7 @@ class TrainingGUI(object):
                         train_graph=st.empty() if self.is_eval else st.line_chart(),
                         valid_graph=st.empty() if self.is_eval else st.line_chart(),
                         is_running=_state,
-                        log_epoch=st.empty(), logs_graph=st.empty(),
+                        logs_graph=st.empty(),
                     )
                     if self.is_eval:
                         train_graph.empty()

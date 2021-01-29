@@ -83,7 +83,7 @@ def model_params(task_path, is_training=False):
 
     st.info('Model params:')
 
-    _dic_model = {}
+    _dic_model = _model_params.get('model_params', {})
 
     st.subheader('Optimizer')
     _options, _default, _params = get_default_params(
