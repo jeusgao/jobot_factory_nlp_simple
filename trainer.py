@@ -19,12 +19,12 @@ from contextlib import redirect_stdout
 from keras_bert import calc_train_steps
 
 from builders import model_builder, train_data_builder
-from modules import DIC_Labelers
-from utils import (
+from utils import task_init
+from modules import (
+    DIC_Labelers,
     TrainingCallbacks,
     EvaluatingCallbacks,
     DIC_Generators_for_train,
-    task_init,
 )
 
 

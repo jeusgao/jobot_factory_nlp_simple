@@ -8,8 +8,6 @@ import json
 
 from utils import (
     DIC_DataLoaders,
-    DIC_Generators_for_train,
-    DIC_Generators_for_pred,
     DIC_Resolvers,
 )
 from modules import(
@@ -19,6 +17,8 @@ from modules import(
     DIC_Bases,
     DIC_Optimizers,
     DIC_Tokenizers,
+    DIC_Generators_for_train,
+    DIC_Generators_for_pred,
 )
 
 
@@ -62,3 +62,4 @@ def env_init():
 
 if __name__ == '__main__':
     env_init()
+    print('System initialized.')

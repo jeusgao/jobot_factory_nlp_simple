@@ -127,7 +127,8 @@ class TrainingGUI(object):
                 _block.empty()
                 self._stop_training()
                 self._start_training()
-            self._monitoring()
+            else:
+                self._monitoring()
         else:
             if os.path.exists(f'{self.task_path}/{self._action}_logs.json'):
                 st.info(f'Last {self._action} logs')

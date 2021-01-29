@@ -8,7 +8,8 @@
 import os
 import pickle
 from builders import model_builder
-from utils import DIC_Generators_for_pred, DIC_Resolvers, task_init
+from modules import DIC_Generators_for_pred
+from utils import DIC_Resolvers, task_init
 
 
 class Predictor(object):

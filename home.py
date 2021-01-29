@@ -8,7 +8,6 @@ import json
 import shutil
 import streamlit as st
 
-from init_params import env_init
 from utils import dump_json
 from gui import (
     model_params,
@@ -17,8 +16,6 @@ from gui import (
     predict_params,
     TrainingGUI,
 )
-
-env_init()
 
 
 def _create_task():

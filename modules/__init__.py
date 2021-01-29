@@ -9,6 +9,8 @@ from keras_bert.layers import MaskedGlobalMaxPool1D
 from .models import base_embed, bert_base, get_model
 from .optimizers import adam, adam_warmup
 from .tokenizers import tokenizer_zh, kwr_labeler
+from .callbacks import TrainingCallbacks, EvaluatingCallbacks
+from .generators import data_generator_train, data_generator_pred
 
 from .layers import (
     KConditionalRandomField,
@@ -100,4 +102,25 @@ DIC_Tokenizers = {
 
 DIC_Labelers = {
     'kwr_labeler': {'func': kwr_labeler},
+}
+
+DIC_Generators_for_train = {
+    'data_generator_for_train': {
+        'func': data_generator_train,
+        'params': {
+            'data': None,
+            'Y': None,
+            'tokenizer': None,
+            'dim': 2,
+            'maxlen': 512,
+            'labeler': None,
+            'activation': 'sigmoid',
+        },
+    }
+}
+
+DIC_Generators_for_pred = {
+    'data_generator_for_pred': {
+        'func': data_generator_pred,
+    }
 }
