@@ -163,19 +163,20 @@ def training_data_params(task_path, is_training=False):
         _options = glob.glob(f'{_dir_data}/{_data_cls}/*.*')
 
         _default = get_default_input(None, _training_data_params, 'fns_train')
-        if not set(_options).intersection(set(_default)):
+
+        if _default and not set(_options).intersection(set(_default)):
             _default = None
         _dic_data = multi_options(task_path, 'fns_train', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
 
         _default = get_default_input(None, _training_data_params, 'fns_dev')
-        if not set(_options).intersection(set(_default)):
+        if _default and not set(_options).intersection(set(_default)):
             _default = None
         _dic_data = multi_options(task_path, 'fns_dev', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
 
         _default = get_default_input(None, _training_data_params, 'fns_test')
-        if not set(_options).intersection(set(_default)):
+        if _default and not set(_options).intersection(set(_default)):
             _default = None
         _dic_data = multi_options(task_path, 'fns_test', _options, _dic_data,
                                   _default=_default, is_set=True, is_params=False)
