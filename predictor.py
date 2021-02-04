@@ -62,6 +62,6 @@ def main(api_name, input1, input2=None):
     if input2:
         inputs.append(input2)
     predictor = DIC_Predictors.get(api_name)
-    rst = predictor.predict([inputs])
+    rst = predictor.predict(inputs)
 
     return rst
