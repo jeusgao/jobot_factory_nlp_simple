@@ -68,12 +68,13 @@ def main(
     data_generator = DIC_Generators_for_train.get(params_data.get('data_generator_for_train')).get('func')
     dim = len(labeler) if labeler else 2
 
+    test_x, test_y, test_steps = train_data_builder(
+        data_loader_params=params_data.get('data_loader_params'),
+        fns=params_data.get('fns_test'),
+        batch_size=batch_size,
+    )
+
     if is_eval:
-        test_x, test_y, test_steps = train_data_builder(
-            data_loader_params=params_data.get('data_loader_params'),
-            fns=params_data.get('fns_test'),
-            batch_size=batch_size,
-        )
         evaluate_callacks = EvaluatingCallbacks(task_path=target_path, log_name=action)
 
         test_D = data_generator(
