@@ -15,8 +15,10 @@ class TrainingCallbacks(keras.callbacks.Callback):
         self.log_name = log_name
 
     def on_train_begin(self, logs):
-        if os.path.exists(f'{self.task_path}/{self.log_name}_logs.json'):
-            os.remove(f'{self.task_path}/{self.log_name}_logs.json')
+        with open(f'{self.task_path}/{self.log_name}_logs.json', 'w') as f:
+            f.write('')
+        # if os.path.exists(f'{self.task_path}/{self.log_name}_logs.json'):
+            # os.remove(f'{self.task_path}/{self.log_name}_logs.json')
 
     def on_train_end(self, logs):
         txt = json.dumps({
@@ -65,8 +67,10 @@ class EvaluatingCallbacks(keras.callbacks.Callback):
 
     def on_test_begin(self, logs=None):
         print('Evaluating ...')
-        if os.path.exists(f'{self.task_path}/{self.log_name}_logs.json'):
-            os.remove(f'{self.task_path}/{self.log_name}_logs.json')
+        with open(f'{self.task_path}/{self.log_name}_logs.json', 'w') as f:
+            f.write('')
+        # if os.path.exists(f'{self.task_path}/{self.log_name}_logs.json'):
+        #     os.remove(f'{self.task_path}/{self.log_name}_logs.json')
 
     def on_test_end(self, logs=None):
         txt = json.dumps({

@@ -37,7 +37,7 @@ def data_generator_train(
             for d in D:
                 x, x_seg = tokenizer.encode(
                     first=d[0][:maxlen],
-                    second=d[1][:maxlen] if len(d) == 2 else None,
+                    second=d[1][:maxlen] if len(d) == 2 and d[1] else None,
                 )
                 X.append(x)
                 X_seg.append(x_seg)
@@ -70,7 +70,7 @@ def data_generator_pred(
         second=data[1][:maxlen] if len(data) == 2 else None,
     )
 
-    X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
-    X_seg = keras.preprocessing.sequence.pad_sequences(X_seg, value=0, padding='post', maxlen=ML)
+    X = keras.preprocessing.sequence.pad_sequences([X], value=0, padding='post', maxlen=ML)
+    X_seg = keras.preprocessing.sequence.pad_sequences([X_seg], value=0, padding='post', maxlen=ML)
 
     return [X, X_seg]
