@@ -3,7 +3,7 @@
 # @Date    : 2021-01-07 13:10:57
 # @Author  : Joe Gao (jeusgao@163.com)
 
-from backend import keras
+from backend import keras, V_TF
 from keras_bert.layers import MaskedGlobalMaxPool1D
 
 from keras_contrib.losses import crf_loss
@@ -16,10 +16,8 @@ from .callbacks import TrainingCallbacks, EvaluatingCallbacks
 from .generators import data_generator_train, data_generator_pred
 
 from .layers import (
-    KConditionalRandomField,
     crf,
     base_inputs,
-    # nonmasking_layer,
     NonMaskingLayer,
     bi_gru,
     dropout,
@@ -33,10 +31,8 @@ from keras_metrics import (
     binary_f1_score,
 )
 
-kcrf = KConditionalRandomField()
 
 DIC_Losses = {
-    'kcrf_loss': {'func': kcrf.loss},
     'crf_loss': {'func': crf_loss},
     'categorical_crossentropy': {
         'func': keras.losses.CategoricalCrossentropy,
@@ -55,7 +51,6 @@ DIC_Metrics = {
     'binary_precision': {'func': binary_precision()},
     'binary_recall': {'func': binary_recall()},
     'binary_f1_score': {'func': binary_f1_score()},
-    'kcrf_accuracy': {'func': kcrf.accuracy},
     'crf_accuracy': {'func': crf_accuracy},
     'accuracy': {'func': 'accuracy'},
 }
@@ -68,9 +63,15 @@ DIC_Layers = {
     'bigru': {'func': bi_gru, 'params': {'units': 64, 'return_sequences': True, 'reset_after': True}},
     'dropout': {'func': dropout, 'params': {'rate': 0.1}},
     'crf': {'func': crf, 'params': {'dim': 2}},
-    'kcrf': {'func': kcrf},
     'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D, 'params': {'name': 'Masked-Global-Pool-Max'}},
 }
+
+if V_TF >= 2.2:
+    from .layers import KConditionalRandomField
+    kcrf = KConditionalRandomField()
+    DIC_Layers['kcrf'] = {'func': kcrf}
+    DIC_Losses['kcrf_loss'] = {'func': kcrf.loss}
+    DIC_Metrics['kcrf_accuracy'] = {'func': kcrf.accuracy}
 
 DIC_Bases = {
     'BERT': {
