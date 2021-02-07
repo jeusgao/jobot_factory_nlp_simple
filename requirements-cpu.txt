@@ -7,3 +7,4 @@ sklearn
 tensorflow_addons
 tqdm
 uvicorn
+git+https://www.github.com/keras-team/keras-contrib.git

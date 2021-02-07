@@ -7,7 +7,7 @@
 
 import random
 import numpy as np
-from tensorflow import keras
+from backend import keras
 
 
 def data_generator_train(
@@ -67,7 +67,7 @@ def data_generator_pred(
 ):
     X, X_seg = tokenizer.encode(
         first=data[0][:maxlen],
-        second=data[1][:maxlen] if len(data) == 2 else None,
+        second=data[1][:maxlen] if len(data) == 2 and d[1] else None,
     )
 
     X = keras.preprocessing.sequence.pad_sequences([X], value=0, padding='post', maxlen=ML)

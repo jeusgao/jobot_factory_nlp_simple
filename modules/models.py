@@ -3,7 +3,7 @@
 # @Date    : 2021-01-04 16:47:15
 # @Author  : Joe Gao (jeusgao@163.com)
 
-from tensorflow import keras
+from backend import keras
 from keras_bert import load_trained_model_from_checkpoint
 
 

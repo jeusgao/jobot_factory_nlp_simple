@@ -5,7 +5,7 @@
 
 from collections import namedtuple
 
-from tensorflow import keras
+from backend import keras
 from keras_bert import calc_train_steps
 
 from utils import get_object, DIC_DataLoaders
@@ -20,7 +20,7 @@ from modules import (
 
 
 def model_builder(
-    # LR=2e-5,
+    TF_KERAS=0,
     maxlen=64,
     ML=64,
     tokenizer_code='tokenizer_zh',
@@ -49,10 +49,17 @@ def model_builder(
     output = base.output
 
     for layer in cfg_model.layers:
-        if 'params' in layer:
+        print(layer)
+        params = layer.get('params', None)
+        if params:
+            # if params == 'base':
+            #     output = get_object(
+            #         func=DIC_Layers.get(layer.get('func')).get('func'),
+            #         params={'base': base})
+            # else:
             output = get_object(
                 func=DIC_Layers.get(layer.get('func')).get('func'),
-                params=layer.get('params'))(output)
+                params=params)(output)
         else:
             output = DIC_Layers.get(layer.get('func')).get('func')(output)
     model = keras.Model(inputs, output)

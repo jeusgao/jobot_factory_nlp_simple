@@ -9,8 +9,9 @@ import tensorflow as tf
 import tensorflow.keras.backend as K
 import tensorflow_addons as tfa
 
-from tensorflow import keras
-from keras_bert.layers import MaskedGlobalMaxPool1D
+from backend import keras
+from keras_bert.layers import MaskedGlobalMaxPool1D, EmbeddingSimilarity, Masked
+from keras_contrib.layers import CRF
 
 
 class KConditionalRandomField(keras.layers.Layer):
@@ -143,10 +144,10 @@ class NonMaskingLayer(keras.layers.Layer):
         return x
 
 
-def nonmasking_layer(base):
-    output_layer = NonMaskingLayer()(base.output)
-    emb_model = keras.Model(base.inputs, output_layer)
-    return emb_model.inputs, emb_model.output
+# def nonmasking_layer(base=None):
+#     output_layer = NonMaskingLayer()(base.output)
+#     emb_model = keras.Model(base.inputs, output_layer)
+#     return emb_model.inputs, emb_model.output
 
 
 def bi_gru(**params):
@@ -157,8 +158,8 @@ def dropout(rate=0.1):
     return keras.layers.Dropout(rate)
 
 
-def crf():
-    return KConditionalRandomField()
+def crf(dim=2):
+    return CRF(dim)
 
 
 def base_inputs(base):

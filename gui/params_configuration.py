@@ -43,7 +43,10 @@ def model_params(task_path, is_training=False):
     #     st.text_input('', _model_params.get('LR') if _model_params else '2e-5')
     # )
 
-    st.subheader('Max lenth')
+    st.subheader('Backend params')
+    _dic['TF_KERAS'] = st.radio('Use TF-Keras?', [0, 1])
+
+    st.subheader('Inputs params')
     maxlen = st.number_input(
         'input max lenth',
         min_value=8,

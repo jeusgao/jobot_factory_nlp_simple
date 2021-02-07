@@ -3,8 +3,11 @@
 # @Date    : 2021-01-07 13:10:57
 # @Author  : Joe Gao (jeusgao@163.com)
 
-from tensorflow import keras
+from backend import keras
 from keras_bert.layers import MaskedGlobalMaxPool1D
+
+from keras_contrib.losses import crf_loss
+from keras_contrib.metrics import crf_viterbi_accuracy as crf_accuracy
 
 from .models import base_embed, bert_base, get_model
 from .optimizers import adam, adam_warmup
@@ -14,8 +17,10 @@ from .generators import data_generator_train, data_generator_pred
 
 from .layers import (
     KConditionalRandomField,
+    crf,
     base_inputs,
-    nonmasking_layer,
+    # nonmasking_layer,
+    NonMaskingLayer,
     bi_gru,
     dropout,
 )
@@ -28,10 +33,11 @@ from keras_metrics import (
     binary_f1_score,
 )
 
-crf = KConditionalRandomField()
+kcrf = KConditionalRandomField()
 
 DIC_Losses = {
-    'crf_loss': {'func': crf.loss},
+    'kcrf_loss': {'func': kcrf.loss},
+    'crf_loss': {'func': crf_loss},
     'categorical_crossentropy': {
         'func': keras.losses.CategoricalCrossentropy,
         'params': {'from_logits': False},
@@ -49,18 +55,20 @@ DIC_Metrics = {
     'binary_precision': {'func': binary_precision()},
     'binary_recall': {'func': binary_recall()},
     'binary_f1_score': {'func': binary_f1_score()},
-    'crf_accuracy': {'func': crf.accuracy},
+    'kcrf_accuracy': {'func': kcrf.accuracy},
+    'crf_accuracy': {'func': crf_accuracy},
     'accuracy': {'func': 'accuracy'},
 }
 
 DIC_Layers = {
     'base_inputs': {'func': base_inputs},
-    'nonmasking_layer': {'func': nonmasking_layer},
+    'nonmasking_layer': {'func': NonMaskingLayer()},
     'input': {'func': keras.layers.Input, 'params': {'shape': (None,)}},
     'dense': {'func': keras.layers.Dense, 'params': {'units': 64, 'activation': 'relu'}},
     'bigru': {'func': bi_gru, 'params': {'units': 64, 'return_sequences': True, 'reset_after': True}},
     'dropout': {'func': dropout, 'params': {'rate': 0.1}},
-    'crf': {'func': crf},
+    'crf': {'func': crf, 'params': {'dim': 2}},
+    'kcrf': {'func': kcrf},
     'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D, 'params': {'name': 'Masked-Global-Pool-Max'}},
 }
 

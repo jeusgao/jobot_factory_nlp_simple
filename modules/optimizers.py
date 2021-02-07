@@ -3,7 +3,7 @@
 # @Date    : 2021-01-04 16:48:17
 # @Author  : Joe Gao (jeusgao@163.com)
 
-from tensorflow import keras
+from backend import keras
 from keras_bert import AdamWarmup, calc_train_steps
 
 

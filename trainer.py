@@ -13,8 +13,9 @@ import json
 import time
 import pickle
 import argparse
+from sklearn.utils import shuffle
 
-from tensorflow import keras
+from backend import keras
 from contextlib import redirect_stdout
 from keras_bert import calc_train_steps
 
@@ -36,6 +37,9 @@ def main(
     params_train=None,
     action='training',
 ):
+    if params_model.get('TF_KERAS', 0) == 1:
+        os.environ["TF_KERAS"] = '1'
+
     maxlen = params_model.get('maxlen')
     ML = params_model.get('ML')
 
@@ -73,6 +77,7 @@ def main(
         fns=params_data.get('fns_test'),
         batch_size=batch_size,
     )
+    test_x, test_y = shuffle(test_x, test_y, random_state=0)
 
     if is_eval:
         evaluate_callacks = EvaluatingCallbacks(task_path=target_path, log_name=action)
@@ -111,6 +116,8 @@ def main(
             fns=params_data.get('fns_dev'),
             batch_size=batch_size,
         )
+        train_x, train_y = shuffle(train_x, train_y, random_state=0)
+        valid_x, valid_y = shuffle(valid_x, valid_y, random_state=0)
         print(len(train_x), len(valid_x))
 
         if fn_labeler and is_sequence:

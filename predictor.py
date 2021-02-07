@@ -17,6 +17,9 @@ class Predictor(object):
         task_path = f'hub/models/{api_name}'
         fn_model, params_model, params_data, _, params_pred = task_init(task_path, is_train=False)
 
+        if params_model.get('TF_KERAS', 0) == 1:
+            os.environ["TF_KERAS"] = '1'
+
         self.labeler, self.tokenizer, self.model = None, None, None
         self.maxlen = params_model.get('maxlen')
         self.ML = params_model.get('ML')

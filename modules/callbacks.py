@@ -6,7 +6,7 @@
 import os
 import json
 import time
-from tensorflow import keras
+from backend import keras
 
 
 class TrainingCallbacks(keras.callbacks.Callback):
@@ -45,7 +45,7 @@ class TrainingCallbacks(keras.callbacks.Callback):
             'EPOCH': epoch,
             'state': 'end',
             'time': time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()),
-            'scores': logs
+            'scores': str(logs)
         })
         with open(f'{self.task_path}/{self.log_name}_logs.json', 'a') as f:
             f.write(f'{txt}\n')
@@ -54,7 +54,7 @@ class TrainingCallbacks(keras.callbacks.Callback):
         txt = json.dumps({
             'batch': epoch,
             'time': time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()),
-            'scores': logs
+            'scores': str(logs)
         })
         with open(f'{self.task_path}/{self.log_name}_logs.json', 'a') as f:
             f.write(f'\t{txt}\n')

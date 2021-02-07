@@ -40,7 +40,7 @@ class TrainingGUI(object):
 
         st.title(f'Task {task_path.split("/")[-1]} {self._action}...')
 
-    def _print_logs(self, _n_curr=0, state='begin', _freq=100, train_graph=None, valid_graph=None, is_running=True, log_epoch=None, logs_graph=None):
+    def _print_logs(self, _n_curr=0, state='begin', _freq=None, train_graph=None, valid_graph=None, is_running=True, log_epoch=None, logs_graph=None):
         logs = get_lines(f'{self.task_path}/{self._action}_logs.json')
         for i, log in enumerate(logs[_n_curr:]):
             if 'EPOCH' in log:
@@ -50,7 +50,7 @@ class TrainingGUI(object):
                     if not self.is_eval:
                         scores = {
                             k: v
-                            for k, v in log.get('scores').items() if k.startswith('val_')
+                            for k, v in eval(str(log.get('scores'))).items() if k.startswith('val_')
                         }
                         valid_graph.add_rows(pd.json_normalize([scores]))
                         st.text(f'EPOCH: {state}, Scores: {scores}')
@@ -63,10 +63,17 @@ class TrainingGUI(object):
                         if is_running:
                             train_graph.json(log)
                     else:
+                        if not _freq:
+                            _freq = len(logs) // 1000
                         if log.get('batch') % _freq == 0:
-                            train_graph.add_rows(pd.json_normalize([log.get('scores')]))
+                            scores = {k: v for k, v in eval(str(log.get('scores'))).items() if k not in ['batch', 'size']}
+                            train_graph.add_rows(pd.json_normalize([scores]))
                 except:
                     continue
+            if 'scores' in log:
+                log = eval(str(log.get('scores')))
+            if 'size' in log:
+                del log['size']
             logs_graph.json(log)
         _n_curr = len(logs)
         return _n_curr, state, train_graph
@@ -150,7 +157,7 @@ class TrainingGUI(object):
             kill_process(f'{self.task_path}/training.pid')
 
             os.remove(self.fn_state)
-            time.sleep(20)
+            time.sleep(5)
             st.warning(f'{self._action} stopped.')
 
     def train(self):
