@@ -60,7 +60,7 @@ def main(
         else:
             labeler = {'O': 0}
 
-    tokenizer, model = model_builder(**params_model)
+    tokenizer, model = model_builder(is_eval=is_eval, **params_model)
 
     if fn_weights:
         model.load_weights(f'{fn_weights}')

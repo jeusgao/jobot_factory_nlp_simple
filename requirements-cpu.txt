@@ -1,5 +1,6 @@
 fastapi
-keras-bert
+keras       # 2.3.1 if tf < 2.3 else ...
+keras-bert  # 0.83 if tf < 2.3 else ...
 keras-metrics
 numpy
 pandas

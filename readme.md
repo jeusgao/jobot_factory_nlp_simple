@@ -14,7 +14,9 @@ open localhost:PORT with a broswer ...
 
 ## ENV
 python >= 3.6
- and test with tf 2.4.0
+</br>
+test with tf 2.4.0, 2.2.2
+</br>
 
 ## references:
 <a href="https://github.com/CyberZHG/keras-bert">keras-bert</a>

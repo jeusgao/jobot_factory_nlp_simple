@@ -76,7 +76,7 @@ class EvaluatingCallbacks(keras.callbacks.Callback):
         txt = json.dumps({
             'EPOCH': 'Finished',
             'time': time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()),
-            'scores': logs
+            'scores': str(logs)
         })
         with open(f'{self.task_path}/{self.log_name}_logs.json', 'a') as f:
             f.write(f'{txt}\n')
@@ -86,7 +86,7 @@ class EvaluatingCallbacks(keras.callbacks.Callback):
         txt = json.dumps({
             'batch': batch,
             'time': time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()),
-            'scores': logs
+            'scores': str(logs)
         })
         with open(f'{self.task_path}/{self.log_name}_logs.json', 'a') as f:
             f.write(f'\t{txt}\n')

@@ -23,6 +23,7 @@ class Predictor(object):
         self.labeler, self.tokenizer, self.model = None, None, None
         self.maxlen = params_model.get('maxlen')
         self.ML = params_model.get('ML')
+        self.is_pair = False if self.ML == self.maxlen + 2 else True
         self.activation = params_data.get('activation')
 
         self.is_sequence = params_data.get('is_sequence')
@@ -36,12 +37,17 @@ class Predictor(object):
         self.data_generator = DIC_Generators_for_pred.get(params_data.get('data_generator_for_pred')).get('func')
         self.resolver = DIC_Resolvers.get(params_pred.get('resolver')).get('func')
 
-        self.tokenizer, self.model = model_builder(**params_model)
+        self.tokenizer, self.model = model_builder(is_eval=True, **params_model)
         # self.model.summary()
         self.model.load_weights(fn_model)
 
     def predict(self, inputs):
-        # data = inputs if self.is_sequence else [inputs]
+        if self.is_pair:
+            if len(inputs) < 2:
+                return {'result': 'Not enough inputs.'}
+        elif len(inputs) > 1:
+            inputs = ['.'.join(inputs)]
+
         data_input = self.data_generator(
             data=inputs,
             tokenizer=self.tokenizer,
@@ -61,8 +67,11 @@ DIC_Predictors = {
 
 
 def main(api_name, input1, input2=None):
+    if not len(input1.strip()):
+        return {'result': 'Empty input(s).'}
+
     inputs = [input1]
-    if input2:
+    if input2 and len(input2.strip()):
         inputs.append(input2)
     predictor = DIC_Predictors.get(api_name)
     rst = predictor.predict(inputs)

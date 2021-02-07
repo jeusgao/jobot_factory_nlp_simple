@@ -20,6 +20,7 @@ from modules import (
 
 
 def model_builder(
+    is_eval=False,
     TF_KERAS=0,
     maxlen=64,
     ML=64,
@@ -52,11 +53,6 @@ def model_builder(
         print(layer)
         params = layer.get('params', None)
         if params:
-            # if params == 'base':
-            #     output = get_object(
-            #         func=DIC_Layers.get(layer.get('func')).get('func'),
-            #         params={'base': base})
-            # else:
             output = get_object(
                 func=DIC_Layers.get(layer.get('func')).get('func'),
                 params=params)(output)
@@ -82,7 +78,7 @@ def model_builder(
     optimizer = get_object(func=optimizer.get('func'), params=_optimizer.get('params'))
 
     model.compile(
-        optimizer=optimizer,
+        optimizer='adam' if is_eval else optimizer,
         loss=loss,
         metrics=metrics,
     )

@@ -30,15 +30,15 @@ def sequences_loader_train(fns=None, dir_data=None, data_cls=None):
             lines = f.read().splitlines()
         x, y = [], []
         for line in lines:
-            row = line.split()
+            row = line.strip().split()
             if len(row) == 1:
                 x.append(' ')
                 y.append(row[0])
             if len(row) <= 1:
-                data_x.append([x])
-                data_y.append(y)
-                x = []
-                y = []
+                if len(x) and len(y):
+                    data_x.append([x])
+                    data_y.append(y)
+                x, y = [], []
             else:
                 x.append(row[0])
                 y.append(row[1])
