@@ -21,6 +21,6 @@ def adam_warmup(len_data=1000, batch_size=128, epochs=5, warmup_proportion=0.1, 
     return AdamWarmup(
         total_steps,
         warmup_steps,
-        lr=lr,
         min_lr=min_lr,
+        learning_rate=lr,
     )

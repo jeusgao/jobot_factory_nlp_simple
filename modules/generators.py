@@ -42,6 +42,8 @@ def data_generator_train(
                 X.append(x)
                 X_seg.append(x_seg)
 
+            ML = max([len(x) for x in X])
+
             X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
             X_seg = keras.preprocessing.sequence.pad_sequences(X_seg, value=0, padding='post', maxlen=ML)
 

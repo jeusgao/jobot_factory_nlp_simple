@@ -6,8 +6,6 @@
 from collections import namedtuple
 
 from backend import keras
-from keras_bert import calc_train_steps
-
 from utils import get_object, DIC_DataLoaders
 from modules import (
     DIC_Layers,

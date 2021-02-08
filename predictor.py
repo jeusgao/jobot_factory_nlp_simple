@@ -25,7 +25,6 @@ class Predictor(object):
         self.ML = params_model.get('ML')
         self.is_pair = False if self.ML == self.maxlen + 2 else True
         self.activation = params_data.get('activation')
-
         self.is_sequence = params_data.get('is_sequence')
 
         fn_labeler = params_data.get('fn_labeler')

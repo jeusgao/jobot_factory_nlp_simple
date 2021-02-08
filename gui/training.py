@@ -71,9 +71,10 @@ class TrainingGUI(object):
                     continue
             if 'scores' in log:
                 batch = log.get('batch')
+                time = log.get('time')
                 log = eval(str(log.get('scores')))
                 if 'batch' not in log:
-                    log['batch'] = f'{batch} (EPOCH: {self.epoch})'
+                    log['batch'] = f'{batch} (EPOCH: {self.epoch}) {time if time else ""}'
             if 'size' in log:
                 del log['size']
             logs_graph.json(log)
