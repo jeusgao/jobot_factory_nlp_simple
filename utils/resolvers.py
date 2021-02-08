@@ -52,7 +52,7 @@ def _resolve_sequence(
 ):
     text = text[0]
     print(pred[0].argmax(axis=-1).tolist()[1:len(text) + 1])
-    _max_ner = pred[0].argmax(axis=-1).tolist()[1:-1]
+    _max_ner = pred[0].argmax(axis=-1).tolist()[1:len(text) + 1]
     rst_ner = _get_label_sequence(id2label, _max_ner, text)
 
     return rst_ner

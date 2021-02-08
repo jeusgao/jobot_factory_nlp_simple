@@ -64,7 +64,7 @@ class TrainingGUI(object):
                             train_graph.json(log)
                     else:
                         if not _freq:
-                            _freq = len(logs) // 1000
+                            _freq = len(logs) // 10
                         if log.get('batch') % _freq == 0:
                             scores = {k: v for k, v in eval(str(log.get('scores'))).items() if k not in ['batch', 'size']}
                             train_graph.add_rows(pd.json_normalize([scores]))
