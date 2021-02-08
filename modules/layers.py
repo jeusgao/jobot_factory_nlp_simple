@@ -126,6 +126,9 @@ if V_TF >= 2.2:
             else:
                 mask = K.cast(mask, y_pred.dtype)
                 return K.sum(isequal * mask) / K.sum(mask)
+else:
+    def crf(dim=2):
+        return CRF(dim)
 
 
 class NonMaskingLayer(keras.layers.Layer):
@@ -149,10 +152,6 @@ def bi_gru(**params):
 
 def dropout(rate=0.1):
     return keras.layers.Dropout(rate)
-
-
-def crf(dim=2):
-    return CRF(dim)
 
 
 def base_inputs(base):

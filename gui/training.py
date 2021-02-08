@@ -37,15 +37,16 @@ class TrainingGUI(object):
         self.task_path = task_path
         self.is_eval = is_eval
         self.is_model_structure_showed = False
+        self.epoch = 0
 
         st.title(f'Task {task_path.split("/")[-1]} {self._action}...')
 
-    def _print_logs(self, _n_curr=0, state='begin', _freq=None, train_graph=None, valid_graph=None, is_running=True, log_epoch=None, logs_graph=None):
+    def _print_logs(self, _n_curr=0, state='begin', _freq=None, train_graph=None, valid_graph=None, is_running=True, logs_graph=None):
         logs = get_lines(f'{self.task_path}/{self._action}_logs.json')
         for i, log in enumerate(logs[_n_curr:]):
             if 'EPOCH' in log:
                 log = json.loads(log.strip())
-                state = log.get('EPOCH')
+                state = self.epoch = log.get('EPOCH')
                 if 'scores' in log:
                     if not self.is_eval:
                         scores = {
@@ -54,8 +55,6 @@ class TrainingGUI(object):
                         }
                         valid_graph.add_rows(pd.json_normalize([scores]))
                         st.text(f'EPOCH: {state}, Scores: {scores}')
-                if log_epoch:
-                    log_epoch.json(log)
             else:
                 try:
                     log = json.loads(log.strip())
@@ -66,12 +65,15 @@ class TrainingGUI(object):
                         if not _freq:
                             _freq = len(logs) // 10
                         if log.get('batch') % _freq == 0:
-                            scores = {k: v for k, v in eval(str(log.get('scores'))).items() if k not in ['batch', 'size']}
+                            scores = {k: v for k, v in eval(str(log.get('scores'))).items() if k not in ['size']}
                             train_graph.add_rows(pd.json_normalize([scores]))
                 except:
                     continue
             if 'scores' in log:
+                batch = log.get('batch')
                 log = eval(str(log.get('scores')))
+                if 'batch' not in log:
+                    log['batch'] = f'{batch} (EPOCH: {self.epoch})'
             if 'size' in log:
                 del log['size']
             logs_graph.json(log)
@@ -95,7 +97,6 @@ class TrainingGUI(object):
 
             train_graph = st.json('') if self.is_eval else st.line_chart()
             valid_graph = st.empty() if self.is_eval else st.line_chart()
-            log_epoch = st.empty()
             logs_graph = st.empty()
 
             self._show_structure()
@@ -109,10 +110,8 @@ class TrainingGUI(object):
                     _freq=_freq,
                     train_graph=train_graph,
                     valid_graph=valid_graph,
-                    log_epoch=log_epoch,
                     logs_graph=logs_graph,
                 )
-            log_epoch.empty()
             if self.is_eval:
                 train_graph.empty()
 

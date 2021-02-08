@@ -34,12 +34,12 @@ def sequences_loader_train(fns=None, dir_data=None, data_cls=None):
             if len(row) == 1:
                 x.append(' ')
                 y.append(row[0])
-            if len(row) <= 1:
+            elif len(row) < 1:
                 if len(x) and len(y):
                     data_x.append(x)
                     data_y.append(y)
                 x, y = [], []
-            else:
+            elif len(row) == 2:
                 x.append(row[0])
                 y.append(row[1])
     return data_x, data_y
