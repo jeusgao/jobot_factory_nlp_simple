@@ -26,11 +26,11 @@ test with tf 2.4.0, 2.2.2
 3. model layers' params settings</br>
 [![model layers' params settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/2.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/2.jpg)
 4. trainning monitoring</br>
-[![trainning monitoring](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/6.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/6.jpg)
+[![trainning monitoring](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/6.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/6.jpg)
 5. trainning scores</br>
-[![trainning scores](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/5.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/5.jpg)
+[![trainning scores](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/5.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/5.jpg)
 6. api published automaticly</br>
-[![api published automaticly](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/1.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/1.jpg)
+[![api published automaticly](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/1.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/1.jpg)
 
 ## references:
 <a href="https://github.com/CyberZHG/keras-bert">keras-bert</a>
