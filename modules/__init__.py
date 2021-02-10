@@ -15,6 +15,7 @@ from .generators import data_generator_train, data_generator_pred
 from .layers import (
     base_inputs,
     nonmasking_layer,
+    NonMaskingLayer,
     bi_gru,
     dropout,
 )

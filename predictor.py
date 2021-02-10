@@ -23,7 +23,7 @@ class Predictor(object):
         self.labeler = None
         self.maxlen = params_model.get('maxlen')
         self.ML = params_model.get('ML')
-        self.is_pair = False if self.ML == self.maxlen + 2 else True
+        self.is_pair = False if self.ML == self.maxlen else True
         self.activation = params_data.get('activation')
         self.is_sequence = params_data.get('is_sequence')
 
@@ -41,6 +41,7 @@ class Predictor(object):
         self.model.load_weights(fn_model)
 
     def predict(self, inputs):
+        print(inputs)
         if self.is_pair:
             if len(inputs) < 2:
                 return {'result': 'Not enough inputs.'}

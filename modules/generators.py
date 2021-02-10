@@ -34,6 +34,8 @@ def data_generator_train(
             D = data[start_index: end_index]
             Y = y_data[start_index: end_index]
 
+            ML = max([len(d[0][:maxlen]) for d in D])
+
             X, X_seg = [], []
             for d in D:
                 if is_sequence:
@@ -45,17 +47,11 @@ def data_generator_train(
                     )
                 X.append(x)
 
-            # ML = max([len(d[0][:maxlen]) for d in D])
-
             X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
             X_seg = np.zeros(shape=(len(X), ML))
 
             if labeler and is_sequence:
-                # Y = [['[CLS]'] + y[:ML - 1] + ['[PAD]'] if len(y) >= ML - 2 else y for y in Y]
-                # Y = [['[CLS]'] + y + ['[PAD]'] * (ML - 1 - len(y)) if len(y) < ML - 2 else y for y in Y]
                 Y = [y[:ML] if len(y) > ML else y for y in Y]
-                Y = [y + ['[PAD]'] * (ML - len(y)) if len(y) < ML else y for y in Y]
-
                 Y = [[labeler.get(l) for l in y] for y in Y]
                 Y = keras.preprocessing.sequence.pad_sequences(Y, maxlen=ML, value=0, padding='post')
             else:

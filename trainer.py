@@ -59,8 +59,7 @@ def main(
             labeler = pickle.load(open(fn_labeler, 'rb'))
         else:
             labeler = {
-                '[PAD]': 0,
-                'O': 1,
+                'O': 0,
             }
 
     tokenizer, token_dict, model = model_builder(is_eval=is_eval, **params_model)
