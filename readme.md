@@ -22,17 +22,21 @@ test with tf 2.4.0, 2.2.2
 1. common params settings
 </br>
 ![imgs/4.jpg]
+</br>
 2. model layers settings
 </br>
 ![imgss/3.jpg]
+</br>
 3. model layers' params settings
 </br>
 ![imgs/2.jpg]
+</br>
 4. trainning monitoring
 </br>
 ![6.jpg]
 </br>
 ![5.jpg]
+</br>
 5. api published automaticly
 </br>
 ![1.jpg]
