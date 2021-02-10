@@ -20,10 +20,15 @@ test with tf 2.4.0, 2.2.2
 
 ## Preview
 ![common params settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/4.jpg)
+</br>
 ![model layers settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/3.jpg)
+</br>
 ![model layers' params settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/2.jpg)
+</br>
 ![trainning monitoring](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/6.jpg)
+</br>
 ![trainning scores](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/5.jpg)
+</br>
 ![api published automaticly](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/1.jpg)
 
 ## references:
