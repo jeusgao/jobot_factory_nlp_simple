@@ -19,16 +19,17 @@ test with tf 2.4.0, 2.2.2
 </br>
 
 ## Preview
+1. common params settings<br>
 [![common params settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/4.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/4.jpg)
-</br>
+2. model layers settings</br>
 [![model layers settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/3.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/3.jpg)
-</br>
+3. model layers' params settings</br>
 [![model layers' params settings](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/2.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/imgs/2.jpg)
-</br>
+4. trainning monitoring</br>
 [![trainning monitoring](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/6.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/6.jpg)
-</br>
+5. trainning scores</br>
 [![trainning scores](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/5.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/5.jpg)
-</br>
+6. api published automaticly</br>
 [![api published automaticly](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/1.jpg)](https://github.com/jeusgao/jobot_factory_nlp_simple/blob/master/1.jpg)
 
 ## references:
