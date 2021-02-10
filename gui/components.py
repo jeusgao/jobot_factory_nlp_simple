@@ -61,7 +61,7 @@ def single_option(tag, dic, main_dic, _options, _params=None, _index=0):
 def multi_options(task_path, tag, options, main_dic, _default=None, fn=None, is_set=False, is_params=True, tpl_dic=None):
     _keys = []
     if is_set:
-        _keys = st.multiselect(tag, options, default=_default, key=tag)
+        _keys = st.multiselect(tag, options, default=_default if _default in options else options[0], key=tag)
     else:
         fn = f'{task_path}/{fn}'
         if os.path.exists(fn):

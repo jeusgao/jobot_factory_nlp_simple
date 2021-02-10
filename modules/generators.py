@@ -14,6 +14,7 @@ def data_generator_train(
     data=None,
     y_data=None,
     tokenizer=None,
+    token_dict=None,
     dim=2,
     maxlen=512,
     ML=512,
@@ -35,21 +36,26 @@ def data_generator_train(
 
             X, X_seg = [], []
             for d in D:
-                x, x_seg = tokenizer.encode(
-                    first=d[0][:maxlen],
-                    second=d[1][:maxlen] if len(d) == 2 and d[1] else None,
-                )
+                if is_sequence:
+                    x = [token_dict.get(w, token_dict.get('[UNK]')) for w in d[0][:ML]]
+                else:
+                    x, _ = tokenizer.encode(
+                        first=d[0][:maxlen],
+                        second=d[1][:maxlen] if len(d) == 2 and d[1] else None,
+                    )
                 X.append(x)
-                X_seg.append(x_seg)
 
-            ML = max([len(x) for x in X])
+            # ML = max([len(d[0][:maxlen]) for d in D])
 
             X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
-            X_seg = keras.preprocessing.sequence.pad_sequences(X_seg, value=0, padding='post', maxlen=ML)
+            X_seg = np.zeros(shape=(len(X), ML))
 
             if labeler and is_sequence:
-                Y = [['O'] + y[:ML - 1] + ['O'] if len(y) >= ML - 2 else y for y in Y]
-                Y = [['O'] + y + ['O'] * (ML - 1 - len(y)) if len(y) < ML - 2 else y for y in Y]
+                # Y = [['[CLS]'] + y[:ML - 1] + ['[PAD]'] if len(y) >= ML - 2 else y for y in Y]
+                # Y = [['[CLS]'] + y + ['[PAD]'] * (ML - 1 - len(y)) if len(y) < ML - 2 else y for y in Y]
+                Y = [y[:ML] if len(y) > ML else y for y in Y]
+                Y = [y + ['[PAD]'] * (ML - len(y)) if len(y) < ML else y for y in Y]
+
                 Y = [[labeler.get(l) for l in y] for y in Y]
                 Y = keras.preprocessing.sequence.pad_sequences(Y, maxlen=ML, value=0, padding='post')
             else:
@@ -64,15 +70,20 @@ def data_generator_train(
 def data_generator_pred(
     data=[],
     tokenizer=None,
+    token_dict=None,
     maxlen=512,
     ML=512,
+    is_sequence=False,
 ):
-    X, X_seg = tokenizer.encode(
-        first=data[0][:maxlen],
-        second=data[1][:maxlen] if len(data) == 2 and d[1] else None,
-    )
+    if is_sequence:
+        X = [token_dict.get(w) for w in data[0][:ML]]
+    else:
+        X, _ = tokenizer.encode(
+            first=data[0][:maxlen],
+            second=data[1][:maxlen] if len(data) == 2 and data[1] else None,
+        )
 
     X = keras.preprocessing.sequence.pad_sequences([X], value=0, padding='post', maxlen=ML)
-    X_seg = keras.preprocessing.sequence.pad_sequences([X_seg], value=0, padding='post', maxlen=ML)
+    X_seg = np.zeros(shape=(len(X), ML))
 
     return [X, X_seg]

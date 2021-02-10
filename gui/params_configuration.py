@@ -101,7 +101,7 @@ def model_params(task_path, is_training=False):
         _model_params, DIC_Losses, 'model_params', sub_tag='loss')
     _dic_model = single_option(
         'loss', DIC_Losses, _dic_model, _options,
-        _params=_params, _index=_options.index(_default)
+        _params=_params, _index=_options.index(_default) if _default in _options else 0
     )
 
     st.subheader('Metrics:')

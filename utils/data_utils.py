@@ -36,7 +36,7 @@ def sequences_loader_train(fns=None, dir_data=None, data_cls=None):
                 y.append(row[0])
             elif len(row) < 1:
                 if len(x) and len(y):
-                    data_x.append([x])
+                    data_x.append([''.join(x)])
                     data_y.append(y)
                 x, y = [], []
             elif len(row) == 2:

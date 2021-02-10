@@ -1,4 +1,4 @@
-A light tool for TF Model building/training/evaluating for simple nlp tasks just by params configuration, training/evaluating monitor and params configure GUI with streamlit.
+A light tool for TF Model building/training/evaluating for simple nlp tasks just by params configuration, training/evaluating monitor and params configure GUI with streamlit, and publish all models' predictors api automatic
 
 copy pretrained LM into hub/bases/ (bert, rbt, albert ...)
 
@@ -17,6 +17,19 @@ python >= 3.6
 </br>
 test with tf 2.4.0, 2.2.2
 </br>
+
+## Preview
+1. common params settings
+![imgs/4.jpg]
+2. model layers settings
+![imgss/3.jpg]
+3. model layers' params settings
+![imgs/2.jpg]
+4. trainning monitoring
+![6.jpg]
+![5.jpg]
+5. api published automaticly
+![1.jpg]
 
 ## references:
 <a href="https://github.com/CyberZHG/keras-bert">keras-bert</a>

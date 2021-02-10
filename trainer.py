@@ -58,9 +58,12 @@ def main(
         if os.path.exists(fn_labeler):
             labeler = pickle.load(open(fn_labeler, 'rb'))
         else:
-            labeler = {'O': 0}
+            labeler = {
+                '[PAD]': 0,
+                'O': 1,
+            }
 
-    tokenizer, model = model_builder(is_eval=is_eval, **params_model)
+    tokenizer, token_dict, model = model_builder(is_eval=is_eval, **params_model)
 
     if fn_weights:
         model.load_weights(f'{fn_weights}')
@@ -86,6 +89,7 @@ def main(
             data=test_x,
             y_data=test_y,
             tokenizer=tokenizer,
+            token_dict=token_dict,
             dim=dim,
             maxlen=maxlen,
             ML=ML,
@@ -125,6 +129,7 @@ def main(
             labeler = func(labeler=labeler, y_data=train_y + valid_y + test_y)
             dim = len(labeler)
             pickle.dump(labeler, open(fn_labeler, 'wb'))
+            print(labeler)
 
         total_steps, warmup_steps = calc_train_steps(
             num_example=len(train_x),
@@ -137,6 +142,7 @@ def main(
             data=train_x,
             y_data=train_y,
             tokenizer=tokenizer,
+            token_dict=token_dict,
             dim=dim,
             maxlen=maxlen,
             ML=ML,
@@ -150,6 +156,7 @@ def main(
             data=valid_x,
             y_data=valid_y,
             tokenizer=tokenizer,
+            token_dict=token_dict,
             dim=dim,
             maxlen=maxlen,
             ML=ML,

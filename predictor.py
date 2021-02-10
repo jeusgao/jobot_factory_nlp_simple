@@ -20,7 +20,7 @@ class Predictor(object):
         if params_model.get('TF_KERAS', 0) == 1:
             os.environ["TF_KERAS"] = '1'
 
-        self.labeler, self.tokenizer, self.model = None, None, None
+        self.labeler = None
         self.maxlen = params_model.get('maxlen')
         self.ML = params_model.get('ML')
         self.is_pair = False if self.ML == self.maxlen + 2 else True
@@ -36,7 +36,7 @@ class Predictor(object):
         self.data_generator = DIC_Generators_for_pred.get(params_data.get('data_generator_for_pred')).get('func')
         self.resolver = DIC_Resolvers.get(params_pred.get('resolver')).get('func')
 
-        self.tokenizer, self.model = model_builder(is_eval=True, **params_model)
+        self.tokenizer, self.token_dict, self.model = model_builder(is_eval=True, **params_model)
         # self.model.summary()
         self.model.load_weights(fn_model)
 
@@ -50,8 +50,10 @@ class Predictor(object):
         data_input = self.data_generator(
             data=inputs,
             tokenizer=self.tokenizer,
+            token_dict=self.token_dict,
             maxlen=self.maxlen,
             ML=self.ML,
+            is_sequence=self.is_sequence,
         )
         pred = self.model.predict(data_input)
         rst = self.resolver(pred, inputs, activation=self.activation, labeler=self.labeler, is_sequence=self.is_sequence)

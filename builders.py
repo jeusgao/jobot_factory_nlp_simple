@@ -29,7 +29,7 @@ def model_builder(
     model_params=None,
 ):
     dic_tokenizer = DIC_Tokenizers.get(tokenizer_code)
-    toker_dict, tokenizer = get_object(
+    token_dict, tokenizer = get_object(
         func=dic_tokenizer.get('func'),
         params=tokenizer_params,
     )
@@ -82,7 +82,7 @@ def model_builder(
     )
 
     # model.summary()
-    return tokenizer, model
+    return tokenizer, token_dict, model
 
 
 def train_data_builder(

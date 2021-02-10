@@ -65,7 +65,7 @@ class TrainingGUI(object):
                         if not _freq:
                             _freq = len(logs) // 10
                         if log.get('batch') % _freq == 0:
-                            scores = {k: v for k, v in eval(str(log.get('scores'))).items() if k not in ['size']}
+                            scores = {k: v for k, v in eval(str(log.get('scores'))).items() if k not in ['batch', 'size']}
                             train_graph.add_rows(pd.json_normalize([scores]))
                 except:
                     continue
@@ -73,8 +73,8 @@ class TrainingGUI(object):
                 batch = log.get('batch')
                 time = log.get('time')
                 log = eval(str(log.get('scores')))
-                if 'batch' not in log:
-                    log['batch'] = f'{batch} (EPOCH: {self.epoch}) {time if time else ""}'
+                # if 'batch' not in log:
+                log['batch'] = f'{batch} (EPOCH: {self.epoch}) {time if time else ""}'
             if 'size' in log:
                 del log['size']
             logs_graph.json(log)
