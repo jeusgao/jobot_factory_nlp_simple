@@ -1,4 +1,4 @@
-A light tool for TF Model building/training/evaluating for simple nlp tasks just by params configuration, training/evaluating monitor and params configure GUI with streamlit, and publish all models' predictors api automatic
+A light tool for TF Model building/training/evaluating for simple nlp tasks just by params configuration, training/evaluating monitor and params configure GUI with streamlit, and auto publish all models' predictor apis
 
 copy pretrained LM into hub/bases/ (bert, rbt, albert ...)
 

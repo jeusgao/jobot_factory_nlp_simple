@@ -49,13 +49,17 @@ def model_builder(
 
     for layer in cfg_model.layers:
         print(layer)
-        params = layer.get('params', None)
-        if params:
-            output = get_object(
-                func=DIC_Layers.get(layer.get('func')).get('func'),
-                params=params)(output)
+        _func = layer.get('func')
+        if _func == 'nonmasking_layer':
+            output = DIC_Layers.get(_func).get('func')(base)
         else:
-            output = DIC_Layers.get(layer.get('func')).get('func')(output)
+            params = layer.get('params', None)
+            if params:
+                output = get_object(
+                    func=DIC_Layers.get(_func).get('func'),
+                    params=params)(output)
+            else:
+                output = DIC_Layers.get(_func).get('func')(output)
     model = keras.Model(inputs, output)
 
     _loss = cfg_model.loss

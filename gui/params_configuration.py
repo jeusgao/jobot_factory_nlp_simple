@@ -61,7 +61,7 @@ def model_params(task_path, is_training=False):
         _default = False
 
     is_pair = st.radio('is pair inputs', [True, False], [True, False].index(_default))
-    _dic['ML'] = maxlen * 2 + 3 if is_pair else maxlen + 2
+    _dic['ML'] = maxlen * 2 + 3 if is_pair else maxlen
 
     st.subheader('Pretrained base model')
     _options, _default = get_default(_model_params, DIC_Bases, 'base_code')
