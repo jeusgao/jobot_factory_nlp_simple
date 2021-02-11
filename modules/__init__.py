@@ -14,7 +14,6 @@ from .generators import data_generator_train, data_generator_pred
 
 from .layers import (
     base_inputs,
-    nonmasking_layer,
     NonMaskingLayer,
     bi_gru,
     dropout,
@@ -52,7 +51,7 @@ DIC_Metrics = {
 
 DIC_Layers = {
     'base_inputs': {'func': base_inputs},
-    'nonmasking_layer': {'func': nonmasking_layer},
+    'nonmasking_layer': {'func': NonMaskingLayer()},
     'input': {'func': keras.layers.Input, 'params': {'shape': (None,)}},
     'dense': {'func': keras.layers.Dense, 'params': {'units': 64, 'activation': 'relu'}},
     'bigru': {'func': bi_gru, 'params': {'units': 64, 'return_sequences': True, 'reset_after': True}},

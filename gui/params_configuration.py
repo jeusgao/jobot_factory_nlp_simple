@@ -57,7 +57,7 @@ def model_params(task_path, is_training=False):
     _dic['maxlen'] = maxlen
 
     _default = True
-    if _model_params and _model_params.get('ML') == _model_params.get('maxlen') + 2:
+    if _model_params and _model_params.get('ML') == _model_params.get('maxlen'):
         _default = False
 
     is_pair = st.radio('is pair inputs', [True, False], [True, False].index(_default))

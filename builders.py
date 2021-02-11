@@ -52,7 +52,7 @@ def model_builder(
         print(layer)
         _func = layer.get('func')
         if _func == 'nonmasking_layer':
-            output_layer = NonMaskingLayer()(base.output)
+            output_layer = DIC_Layers.get(_func).get('func')(base.output)
             embed_model = keras.models.Model(base.inputs, output_layer)
             inputs, output = embed_model.inputs, embed_model.output
         else:

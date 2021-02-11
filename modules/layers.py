@@ -146,12 +146,6 @@ class NonMaskingLayer(keras.layers.Layer):
         return x
 
 
-def nonmasking_layer(base):
-    output_layer = NonMaskingLayer()(base.output)
-    embed_model = keras.models.Model(base.inputs, output_layer)
-    return embed_model.inputs, embed_model.output
-
-
 def bi_gru(**params):
     return keras.layers.Bidirectional(keras.layers.GRU(**params))
 
