@@ -26,9 +26,7 @@ def tokenizer_zh(fn_vocab=None):
         for line in reader:
             token = line.strip()
             token_dict[token] = len(token_dict)
-
     tokenizer = TokenizerZh(token_dict)
-
     return token_dict, tokenizer
 
 
@@ -38,5 +36,12 @@ def kwr_labeler(labeler=None, y_data=None):
             for y in seq:
                 if y not in labeler:
                     labeler[y] = len(labeler)
+    return labeler
 
+
+def cls_labeler(labeler=None, y_data=None):
+    if y_data:
+        for y in y_data:
+            if y not in labeler:
+                labeler[y] = len(labeler)
     return labeler

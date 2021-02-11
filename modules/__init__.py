@@ -8,7 +8,7 @@ from keras_bert.layers import MaskedGlobalMaxPool1D
 
 from .models import base_embed, bert_base, get_model
 from .optimizers import adam, adam_warmup
-from .tokenizers import tokenizer_zh, kwr_labeler
+from .tokenizers import tokenizer_zh, kwr_labeler, cls_labeler
 from .callbacks import TrainingCallbacks, EvaluatingCallbacks
 from .generators import data_generator_train, data_generator_pred
 
@@ -112,6 +112,7 @@ DIC_Tokenizers = {
 
 DIC_Labelers = {
     'kwr_labeler': {'func': kwr_labeler},
+    'cls_labeler': {'func': cls_labeler},
 }
 
 DIC_Generators_for_train = {

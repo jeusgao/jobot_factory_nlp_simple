@@ -62,6 +62,11 @@ def _duplicate_task(task_path, new_name, block_ok):
                     shutil.copy(f'{task_path}/params_model.json', f'hub/models/{_name}')
                 if os.path.exists(f'{task_path}/params_train.json'):
                     shutil.copy(f'{task_path}/params_train.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/params_pred.json'):
+                    shutil.copy(f'{task_path}/params_pred.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/tmp_layers.txt'):
+                    shutil.copy(f'{task_path}/tmp_layers.txt', f'hub/models/{_name}')
+
                 st.success(f'Task {_name} created.')
             else:
                 st.warning(f'Task {_name} already existed.')

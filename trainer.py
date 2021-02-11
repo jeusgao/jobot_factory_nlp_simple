@@ -123,12 +123,11 @@ def main(
         valid_x, valid_y = shuffle(valid_x, valid_y, random_state=0)
         print(len(train_x), len(valid_x))
 
-        if fn_labeler and is_sequence:
-            func = DIC_Labelers.get('kwr_labeler').get('func')
+        if fn_labeler:
+            func = DIC_Labelers.get('kwr_labeler').get('func') if is_sequence else DIC_Labelers.get('cls_labeler').get('func')
             labeler = func(labeler=labeler, y_data=train_y + valid_y + test_y)
             dim = len(labeler)
             pickle.dump(labeler, open(fn_labeler, 'wb'))
-            print(labeler)
 
         total_steps, warmup_steps = calc_train_steps(
             num_example=len(train_x),

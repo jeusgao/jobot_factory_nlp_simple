@@ -50,10 +50,13 @@ def data_generator_train(
             X = keras.preprocessing.sequence.pad_sequences(X, value=0, padding='post', maxlen=ML)
             X_seg = np.zeros(shape=(len(X), ML))
 
-            if labeler and is_sequence:
-                Y = [y[:ML] if len(y) > ML else y for y in Y]
-                Y = [[labeler.get(l) for l in y] for y in Y]
-                Y = keras.preprocessing.sequence.pad_sequences(Y, maxlen=ML, value=0, padding='post')
+            if labeler:
+                if is_sequence:
+                    Y = [y[:ML] if len(y) > ML else y for y in Y]
+                    Y = [[labeler.get(l) for l in y] for y in Y]
+                    Y = keras.preprocessing.sequence.pad_sequences(Y, maxlen=ML, value=0, padding='post')
+                else:
+                    Y = np.array([labeler.get(y) for y in Y])
             else:
                 Y = np.array(Y)
 

@@ -1,11 +1,12 @@
 fastapi
-keras==2.3.1       # 2.3.1 if tf < 2.3 else ...
-keras-bert==0.83  # 0.83 if tf < 2.3 else ...
+keras      # 2.3.1 if tf < 2.3 else ...
+keras-bert  # 0.83 if tf < 2.3 else ...
 keras-metrics
 numpy
 pandas
 sklearn
-# tensorflow_addons
+tensorflow
+tensorflow_addons
 tqdm
 uvicorn
 git+https://www.github.com/keras-team/keras-contrib.git

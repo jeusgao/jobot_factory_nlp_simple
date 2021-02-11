@@ -10,6 +10,7 @@ import pickle
 from builders import model_builder
 from modules import DIC_Generators_for_pred
 from utils import DIC_Resolvers, task_init
+from backend import V_TF
 
 
 class Predictor(object):
@@ -61,10 +62,13 @@ class Predictor(object):
         return rst
 
 
+v_lower = ['ner']
+v_higher = ['ner_23']
+include = v_lower if V_TF < 2.2 else v_higher
 models = tuple(os.walk('hub/models'))[0][1]
 
 DIC_Predictors = {
-    k: Predictor(k) for k in models if os.path.exists(f'hub/models/{k}/model.h5')
+    k: Predictor(k) for k in models if os.path.exists(f'hub/models/{k}/model.h5') and k in include
 }
 
 
