@@ -20,7 +20,6 @@ from gui import (
 
 def _create_task():
     st.title('Create a new task')
-    task_path = st.empty()
     _name = st.text_input('Input a task name please', '')
     if st.button('Submit'):
         _name = _name.strip()
@@ -49,6 +48,27 @@ def _remove_task(task_path, block_title, block_remove, block_cancel):
         block_title.success(f'Task remove canceled.')
 
 
+def _duplicate_task(task_path, new_name, block_ok):
+    st.title('Duplicate task ...')
+    _name = st.text_input('Input a new task name please', '')
+    if st.button('Submit'):
+        _name = _name.strip()
+        if _name:
+            if not os.path.exists(f'hub/models/{_name}'):
+                os.makedirs(f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/params_data.json'):
+                    shutil.copy(f'{task_path}/params_data.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/params_model.json'):
+                    shutil.copy(f'{task_path}/params_model.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/params_train.json'):
+                    shutil.copy(f'{task_path}/params_train.json', f'hub/models/{_name}')
+                st.success(f'Task {_name} created.')
+            else:
+                st.warning(f'Task {_name} already existed.')
+        else:
+            st.warning('Please input a Task Name.')
+
+
 def _task_management(task_path):
     task_path = f"hub/models/{task_path}"
     action = st.sidebar.radio(
@@ -57,6 +77,7 @@ def _task_management(task_path):
             'Training params configuration',
             'Train the model',
             'Evaluate the model',
+            f'Duplicate task - {task_path}',
             f'Remove task - {task_path}',
         ]
     )
@@ -85,6 +106,11 @@ def _task_management(task_path):
             training_gui.train()
         else:
             st.warning('Model weights not found, please train the model first.')
+
+    if action == f'Duplicate task - {task_path}':
+        new_name = st.empty()
+        block_ok = st.empty()
+        _duplicate_task(task_path, new_name, block_ok)
 
     if action == f'Remove task - {task_path}':
         if is_running:
