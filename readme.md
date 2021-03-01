@@ -35,4 +35,6 @@ test with tf 2.4.0, 2.2.2
 ## references:
 <a href="https://github.com/CyberZHG/keras-bert">keras-bert</a>
 </br>
-<a href="https://github.com/BrikerMan/Kashgari.git">Kashgari</a>
+<a href="https://github.com/BrikerMan/Kashgari">Kashgari</a>
+</br>
+<a href="https://github.com/bojone/bert4keras">Bert4Keras</a>
