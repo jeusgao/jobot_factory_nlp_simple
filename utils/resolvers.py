@@ -65,6 +65,8 @@ def resolve(pred, text, activation='sigmoid', labeler=None, is_sequence=False, t
         id2label = None
         if labeler:
             id2label = {v: k for k, v in labeler.items()}
+        else:
+            return {'result': 'Labeler not found.'}
         rst = _resolve_sequence(
             pred,
             text,

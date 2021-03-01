@@ -75,7 +75,7 @@ def data_generator_pred(
     is_sequence=False,
 ):
     if is_sequence:
-        X = [token_dict.get(w) for w in data[0][:ML]]
+        X = [token_dict.get(w, token_dict.get('[UNK]')) for w in data[0][:ML]]
     else:
         X, _ = tokenizer.encode(
             first=data[0][:maxlen],

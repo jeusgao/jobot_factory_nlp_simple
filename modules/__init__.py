@@ -17,6 +17,8 @@ from .layers import (
     NonMaskingLayer,
     bi_gru,
     dropout,
+    layer_normalization,
+    batch_normalization,
 )
 from keras_metrics import (
     categorical_precision,
@@ -54,13 +56,15 @@ DIC_Layers = {
     'nonmasking_layer': {'func': NonMaskingLayer()},
     'input': {'func': keras.layers.Input, 'params': {'shape': (None,)}},
     'dense': {'func': keras.layers.Dense, 'params': {'units': 64, 'activation': 'relu'}},
+    'lambda': {'func': keras.layers.Lambda},
     'bigru': {'func': bi_gru, 'params': {'units': 64, 'return_sequences': True, 'reset_after': True}},
     'dropout': {'func': dropout, 'params': {'rate': 0.1}},
-    # 'crf': {'func': crf, 'params': {'dim': 2}},
     'masked_global_max_pool1D': {'func': MaskedGlobalMaxPool1D, 'params': {'name': 'Masked-Global-Pool-Max'}},
+    'layer_normalization': {'func': layer_normalization, 'params': {'axis': -1, 'epsilon': 0.001, }},
+    'batch_normalization': {'func': batch_normalization, 'params': {'axis': -1, 'epsilon': 0.001, }},
 }
 
-if V_TF >= 2.2:
+if V_TF >= '2.2':
     from .layers import KConditionalRandomField
     kcrf = KConditionalRandomField()
     DIC_Layers['kcrf'] = {'func': kcrf}

@@ -4,13 +4,12 @@
 # @Author  : Joe Gao (jeusgao@163.com)
 
 from distutils.version import LooseVersion
-from backend import keras, V_TF
+from backend import keras, V_TF, K
 from keras_contrib.layers import CRF
 from keras_bert.layers import MaskedGlobalMaxPool1D, EmbeddingSimilarity, Masked
 
-if V_TF >= 2.2:
+if V_TF >= '2.3':
     import tensorflow as tf
-    import tensorflow.keras.backend as K
     import tensorflow_addons as tfa
 
     class KConditionalRandomField(keras.layers.Layer):
@@ -39,7 +38,7 @@ if V_TF >= 2.2:
         def __init__(self,
                      sparse_target=True,
                      **kwargs):
-            if LooseVersion(tf.__version__) < '2.2.0':
+            if LooseVersion(V_TF) < '2.2.0':
                 raise ImportError("The KConditionalRandomField requires TensorFlow 2.2.x version or higher.")
 
             super().__init__()
@@ -146,6 +145,133 @@ class NonMaskingLayer(keras.layers.Layer):
         return x
 
 
+class LayerNormalization(keras.layers.Layer):
+    """(Conditional) Layer Normalization
+    hidden_*系列参数仅为有条件输入时(conditional=True)使用
+    """
+
+    def __init__(
+        self,
+        center=True,
+        scale=True,
+        epsilon=None,
+        conditional=False,
+        hidden_units=None,
+        hidden_activation='linear',
+        hidden_initializer='glorot_uniform',
+        **kwargs
+    ):
+        super(LayerNormalization, self).__init__(**kwargs)
+        self.center = center
+        self.scale = scale
+        self.conditional = conditional
+        self.hidden_units = hidden_units
+        self.hidden_activation = keras.activations.get(hidden_activation)
+        self.hidden_initializer = keras.initializers.get(hidden_initializer)
+        self.epsilon = epsilon or 1e-12
+
+    def compute_mask(self, inputs, mask=None):
+        if self.conditional:
+            masks = mask if mask is not None else []
+            masks = [m[None] for m in masks if m is not None]
+            if len(masks) == 0:
+                return None
+            else:
+                return K.all(K.concatenate(masks, axis=0), axis=0)
+        else:
+            return mask
+
+    def build(self, input_shape):
+        super(LayerNormalization, self).build(input_shape)
+
+        if self.conditional:
+            shape = (input_shape[0][-1],)
+        else:
+            shape = (input_shape[-1],)
+
+        if self.center:
+            self.beta = self.add_weight(
+                shape=shape, initializer='zeros', name='beta'
+            )
+        if self.scale:
+            self.gamma = self.add_weight(
+                shape=shape, initializer='ones', name='gamma'
+            )
+
+        if self.conditional:
+
+            if self.hidden_units is not None:
+                self.hidden_dense = keras.layers.Dense(
+                    units=self.hidden_units,
+                    activation=self.hidden_activation,
+                    use_bias=False,
+                    kernel_initializer=self.hidden_initializer
+                )
+
+            if self.center:
+                self.beta_dense = keras.layers.Dense(
+                    units=shape[0], use_bias=False, kernel_initializer='zeros'
+                )
+            if self.scale:
+                self.gamma_dense = keras.layers.Dense(
+                    units=shape[0], use_bias=False, kernel_initializer='zeros'
+                )
+
+    # @recompute_grad
+    def call(self, inputs):
+        """如果是条件Layer Norm，则默认以list为输入，第二个是condition
+        """
+        if self.conditional:
+            inputs, cond = inputs
+            if self.hidden_units is not None:
+                cond = self.hidden_dense(cond)
+            for _ in range(K.ndim(inputs) - K.ndim(cond)):
+                cond = K.expand_dims(cond, 1)
+            if self.center:
+                beta = self.beta_dense(cond) + self.beta
+            if self.scale:
+                gamma = self.gamma_dense(cond) + self.gamma
+        else:
+            if self.center:
+                beta = self.beta
+            if self.scale:
+                gamma = self.gamma
+
+        outputs = inputs
+        if self.center:
+            mean = K.mean(outputs, axis=-1, keepdims=True)
+            outputs = outputs - mean
+        if self.scale:
+            variance = K.mean(K.square(outputs), axis=-1, keepdims=True)
+            std = K.sqrt(variance + self.epsilon)
+            outputs = outputs / std
+            outputs = outputs * gamma
+        if self.center:
+            outputs = outputs + beta
+
+        return outputs
+
+    def compute_output_shape(self, input_shape):
+        if self.conditional:
+            return input_shape[0]
+        else:
+            return input_shape
+
+    def get_config(self):
+        config = {
+            'center': self.center,
+            'scale': self.scale,
+            'epsilon': self.epsilon,
+            'conditional': self.conditional,
+            'hidden_units': self.hidden_units,
+            'hidden_activation': keras.activations.serialize(self.hidden_activation),
+            'hidden_initializer':
+                keras.initializers.serialize(self.hidden_initializer),
+        }
+        base_config = super(LayerNormalization, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
 def bi_gru(**params):
     return keras.layers.Bidirectional(keras.layers.GRU(**params))
 
@@ -156,3 +282,11 @@ def dropout(rate=0.1):
 
 def base_inputs(base):
     return base.inputs, base.output
+
+
+def layer_normalization(**params):
+    return LayerNormalization(**params)
+
+
+def batch_normalization(**params):
+    return keras.layers.BatchNormalization(**params)
