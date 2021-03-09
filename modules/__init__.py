@@ -66,7 +66,7 @@ DIC_Layers = {
 
 if V_TF >= '2.2':
     from .layers import KConditionalRandomField
-    kcrf = KConditionalRandomField()
+    kcrf = KConditionalRandomField
     DIC_Layers['kcrf'] = {'func': kcrf}
     DIC_Losses['kcrf_loss'] = {'func': kcrf.loss}
     DIC_Metrics['kcrf_accuracy'] = {'func': kcrf.accuracy}
