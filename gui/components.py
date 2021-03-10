@@ -45,15 +45,16 @@ def get_default_params(params, dic, tag, sub_tag=None):
 
 
 def single_option(tag, dic, main_dic, _options, _params=None, _index=0):
-    _option = st.selectbox('', _options, index=_index)
+    col1, col2 = st.beta_columns([1, 3])
+    _option = col1.selectbox('Select an optimizer:', _options, index=_index)
     if not _params:
         _params = dic.get(_option).get('params')
     if _params:
-        _params = eval(st.text_input(f'{_option} params:', _params))
+        _params = eval(col2.text_input(f'{_option} params:', _params))
         dic[_option]['params'] = _params
         main_dic[tag] = {'func': _option, 'params': _params}
     else:
-        st.write(f'{_option}: None params')
+        col2.write(f'{_option}: None params')
         main_dic[tag] = {'func': _option}
     return main_dic
 
@@ -72,8 +73,11 @@ def multi_options(task_path, tag, options, main_dic, _default=None, fn=None, is_
             with open(fn, 'r') as f:
                 _keys = f.read().splitlines()
 
-        for key in options:
-            if st.button(key, key=key):
+        cols = st.beta_columns(len(options))
+
+        for i, col in enumerate(cols):
+            key = options[i]
+            if col.button(key, key=key):
                 _keys.append(key)
         _keys = st.text_area(f'{tag} structure:', '\n'.join(_keys), height=200).splitlines()
 

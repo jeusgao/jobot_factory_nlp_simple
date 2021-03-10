@@ -4,6 +4,7 @@
 # @Author  : Joe Gao (jeusgao@163.com)
 
 import os
+import re
 import json
 import shutil
 import streamlit as st
@@ -16,6 +17,14 @@ from gui import (
     predict_params,
     TrainingGUI,
 )
+
+
+def _regex_test():
+    _text = st.text_input('Input a text please', '')
+    _reg = st.text_input('Input a regex string please', '')
+    _mode = st.radio('Select a reg mode please', ['Match', 'Split'])
+    if st.button('Submit'):
+        st.write(re.match(_reg, _text) if _mode == 'Match' else re.split(_reg, _text))
 
 
 def _create_task():
@@ -90,15 +99,18 @@ def _task_management(task_path):
     is_running = os.path.exists(f'{task_path}/state.json')
 
     if action == 'Training params configuration':
-        cfg = st.radio('Select a params set to customize:', [
-                       'Training data', 'Model', 'Taining task', 'Predictor params'])
-        if cfg == 'Training data':
+        st.subheader('Select a params set to customize:')
+        col1, col2, col3, col4 = st.beta_columns(4)
+        if col1.button('Training data'):
             training_data_params(task_path, is_training=is_running)
-        if cfg == 'Model':
+
+        if col2.button('Model params'):
             model_params(task_path, is_training=is_running)
-        if cfg == 'Taining task':
+
+        if col3.button('Taining task'):
             training_params(task_path, is_training=is_running)
-        if cfg == 'Predictor params':
+
+        if col4.button('Predictor params'):
             predict_params(task_path, is_training=is_running)
 
     if action == 'Train the model':
@@ -127,7 +139,8 @@ def _task_management(task_path):
             _remove_task(task_path, block_title, block_remove, block_cancel)
 
 
-task_action = st.sidebar.radio('', ['New task', 'Select task from exists'])
+task_action = st.sidebar.radio('', ['New task', 'Select task from exists', 'Regex test'])
+
 if task_action == 'New task':
     _create_task()
 
@@ -139,3 +152,6 @@ if task_action == 'Select task from exists':
             _task_management(task_path)
     else:
         st.warning('No task exists, please create a task first.')
+
+if task_action == 'Regex test':
+    _regex_test()

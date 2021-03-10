@@ -124,7 +124,7 @@ class TrainingGUI(object):
 
     def _start_training(self):
         _block = st.empty()
-        _start = _block.button(f'Start {self._action}...')
+        _start = _block.button(f'🚀 Start {self._action}...')
         if _start:
             dump_json(self.fn_state, {f'{self._action}_state': True})
             res = training_excute.delay(self.task_path, action=self._action)
