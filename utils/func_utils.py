@@ -5,10 +5,22 @@
 
 import os
 import json
+from collections import namedtuple
 
 
 def get_object(func=None, params=None):
-    return func(**params) if params else func()
+    if params:
+        if isinstance(params, dict):
+            return func(**params)
+        else:
+            return func(params)
+    else:
+        return func
+
+
+def get_namedtuple(tag, dic):
+    CFG_MODEL = namedtuple(tag, dic.keys())
+    return CFG_MODEL(**dic)
 
 
 def task_init(task_path, is_train=True):
@@ -19,19 +31,39 @@ def task_init(task_path, is_train=True):
 
     fn_model = f'{task_path}/model.h5'
 
-    with open(f'{task_path}/params_model.json') as f:
-        params_model = json.load(f)
+    dic_task_params = {}
+
+    with open(f'{task_path}/model_bases_params.json') as f:
+        dic_task_params['model_bases_params'] = json.load(f)
+
+    with open(f'{task_path}/model_common_params.json') as f:
+        dic_task_params['model_common_params'] = get_namedtuple('model_common_params', json.load(f))
+
+    with open(f'{task_path}/model_embeded_params.json') as f:
+        dic_task_params['model_embeded_params'] = json.load(f)
+
+    with open(f'{task_path}/model_inputs_params.json') as f:
+        dic_task_params['model_inputs_params'] = json.load(f)
+
+    with open(f'{task_path}/model_layer_params.json') as f:
+        dic_task_params['model_layer_params'] = json.load(f)
+
+    with open(f'{task_path}/model_outputs_params.json') as f:
+        dic_task_params['model_outputs_params'] = json.load(f)
+
+    with open(f'{task_path}/model_optimizer_params.json') as f:
+        dic_task_params['model_optimizer_params'] = get_namedtuple('model_optimizer_params', json.load(f))
 
     with open(f'{task_path}/params_data.json') as f:
-        params_data = json.load(f)
+        dic_task_params['params_data'] = get_namedtuple('params_data', json.load(f))
 
     with open(f'{task_path}/params_train.json') as f:
-        params_train = json.load(f)
+        dic_task_params['params_train'] = get_namedtuple('params_train', json.load(f))
 
     with open(f'{task_path}/params_pred.json') as f:
-        params_pred = json.load(f)
+        dic_task_params['params_pred'] = get_namedtuple('params_pred', json.load(f))
 
-    return fn_model, params_model, params_data, params_train, params_pred
+    return fn_model, dic_task_params
 
 
 def get_params(fn):

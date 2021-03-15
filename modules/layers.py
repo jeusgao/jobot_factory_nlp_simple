@@ -290,3 +290,8 @@ def layer_normalization(**params):
 
 def batch_normalization(**params):
     return keras.layers.BatchNormalization(**params)
+
+
+def reshape(param):
+    param = tuple(param)
+    return keras.layers.Reshape(param)

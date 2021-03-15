@@ -32,25 +32,33 @@ from modules import (
 def main(
     fn_model,
     target_path=None,
-    params_model=None,
+    action='training',
+    model_bases_params=None,
+    model_common_params=None,
+    model_embeded_params=None,
+    model_inputs_params=None,
+    model_layer_params=None,
+    model_outputs_params=None,
+    model_optimizer_params=None,
     params_data=None,
     params_train=None,
-    action='training',
+    params_pred=None,
 ):
-    if params_model.get('TF_KERAS', 0) == 1:
+    if model_common_params.TF_KERAS == 1:
         os.environ["TF_KERAS"] = '1'
 
-    maxlen = params_model.get('maxlen')
-    ML = params_model.get('ML')
+    maxlen = model_common_params.maxlen
+    ML = model_common_params.ML
 
-    batch_size = params_data.get('batch_size')
-    activation = params_data.get('activation')
-    fn_labeler = params_data.get('fn_labeler')
-    is_sequence = params_data.get('is_sequence')
+    batch_size = params_data.batch_size
+    activation = params_data.activation
+    fn_labeler = params_data.fn_labeler
+    is_sequence = params_data.is_sequence
 
     is_eval = action == 'evaluating'
 
-    fn_weights = fn_model if is_eval else params_train.get('checkpoint')
+    fn_weights = fn_model if is_eval else params_train.checkpoint
+    # fn_weights = fn_model
 
     labeler = None
     if fn_labeler:
@@ -61,25 +69,42 @@ def main(
             labeler = {
                 'O': 0,
             }
+###
+    params_model = {}
+    params_model['is_eval'] = is_eval
+    params_model['maxlen'] = maxlen
+    params_model['ML'] = ML
+    params_model['tokenizer_code'] = 'tokenizer_zh'
+    params_model['tokenizer_params'] = {'fn_vocab': 'hub/bases/rbtl3/vocab.txt'}
+    params_model['obj_common'] = model_common_params
+    params_model['dic_bases'] = model_bases_params
+    params_model['dic_embeds'] = model_embeded_params
+    params_model['list_inputs'] = model_inputs_params
+    params_model['dic_layers'] = model_layer_params
+    params_model['dic_outputs'] = model_outputs_params
+    params_model['obj_optimizer'] = model_optimizer_params
 
-    tokenizer, token_dict, model = model_builder(is_eval=is_eval, **params_model)
+    tokenizer, token_dict, model = model_builder(**params_model)
 
     if fn_weights:
         model.load_weights(f'{fn_weights}')
+        print('Weights loaded.')
 
     with open(f'{target_path}/model_structs.txt', 'w') as f:
         with redirect_stdout(f):
             model.summary()
+        print('model structs saved.')
 
-    data_generator = DIC_Generators_for_train.get(params_data.get('data_generator_for_train')).get('func')
+    data_generator = DIC_Generators_for_train.get(params_data.data_generator_for_train).get('func')
     dim = len(labeler) if labeler else 2
 
     test_x, test_y, test_steps = train_data_builder(
-        data_loader_params=params_data.get('data_loader_params'),
-        fns=params_data.get('fns_test'),
+        data_loader_params=params_data.data_loader_params,
+        fns=params_data.fns_test,
         batch_size=batch_size,
     )
     test_x, test_y = shuffle(test_x, test_y, random_state=0)
+    print(f'Test data lenth: {len(test_x)}.')
 
     if is_eval:
         evaluate_callacks = EvaluatingCallbacks(task_path=target_path, log_name=action)
@@ -110,13 +135,13 @@ def main(
     else:
 
         train_x, train_y, train_steps = train_data_builder(
-            data_loader_params=params_data.get('data_loader_params'),
-            fns=params_data.get('fns_train'),
+            data_loader_params=params_data.data_loader_params,
+            fns=params_data.fns_train,
             batch_size=batch_size,
         )
         valid_x, valid_y, valid_steps = train_data_builder(
-            data_loader_params=params_data.get('data_loader_params'),
-            fns=params_data.get('fns_dev'),
+            data_loader_params=params_data.data_loader_params,
+            fns=params_data.fns_dev,
             batch_size=batch_size,
         )
         train_x, train_y = shuffle(train_x, train_y, random_state=0)
@@ -164,14 +189,14 @@ def main(
             is_sequence=is_sequence,
         )
 
-        cp_loss = keras.callbacks.ModelCheckpoint(fn_model, **params_train.get('cp_loss'))
-        early_stopping = keras.callbacks.EarlyStopping(**params_train.get('early_stopping'))
+        cp_loss = keras.callbacks.ModelCheckpoint(fn_model, **params_train.cp_loss)
+        early_stopping = keras.callbacks.EarlyStopping(**params_train.early_stopping)
         train_callbacks = TrainingCallbacks(task_path=target_path)
 
         model.fit(
             train_D,
             steps_per_epoch=train_steps,
-            epochs=params_train.get('epochs'),
+            epochs=params_train.epochs,
             validation_data=valid_D,
             validation_steps=valid_steps,
             verbose=1,
@@ -192,13 +217,11 @@ if __name__ == '__main__':
     target_path = args.path
     action = args.action
 
-    fn_model, params_model, params_data, params_train, _ = task_init(target_path)
+    fn_model, dic_task_params = task_init(target_path)
 
     main(
         fn_model,
         target_path=target_path,
-        params_model=params_model,
-        params_data=params_data,
-        params_train=params_train,
         action=action,
+        **dic_task_params,
     )

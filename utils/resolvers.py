@@ -84,3 +84,33 @@ def resolve(pred, text, activation='sigmoid', labeler=None, is_sequence=False, t
             rst = labeler.get(rst, 0)
 
     return {'result': rst, 'score': score}
+
+
+def resolve_spo(pred, text, **params):
+    text = text[0]
+    pred_words = pred[0][0].argmax(axis=-1).tolist()[:len(text)]
+
+    words, word, pos = {}, '', 0
+    for i, p in enumerate(pred_words):
+        if p > 0:
+            if p == 1:
+                pos = i
+                if len(word):
+                    words[i - len(word)] = word
+                word = text[i]
+            else:
+                word += text[i]
+        elif len(word):
+            words[pos] = word
+            word = ''
+    if len(word) > 0:
+        words[pos] = word
+
+    pred_rels = pred[1][0].argmax(axis=-1).tolist()
+    rels = []
+    for i, scores in enumerate(pred_rels):
+        for j, score in enumerate(scores):
+            if score > 0:
+                rels.append({'from_word': words.get(j), 'pos': j, 'to_word': words.get(i), 'pos': i})
+
+    return {'text': text, 'words': words, 'rels': rels}

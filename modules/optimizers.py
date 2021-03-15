@@ -112,3 +112,6 @@ def extend_with_exponential_moving_average(BaseOptimizer):
             K.batch_set_value(zip(self.model_weights, self.old_weights))
 
     return NewOptimizer
+
+
+AdamEMA = extend_with_exponential_moving_average(keras.optimizers.Adam, name='AdamEMA')

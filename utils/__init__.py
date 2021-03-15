@@ -6,6 +6,7 @@
 from .data_utils import (
     sentences_loader_train,
     sequences_loader_train,
+    rel_data_loader,
 )
 from .func_utils import (
     get_object,
@@ -17,11 +18,14 @@ from .func_utils import (
     kill_process,
     dump_json,
 )
-from .resolvers import resolve
+from .resolvers import resolve, resolve_spo
 
 DIC_Resolvers = {
     'resolver': {
         'func': resolve
+    },
+    'spo_resolver': {
+        'func': resolve_spo
     },
 }
 
@@ -42,5 +46,12 @@ DIC_DataLoaders = {
             'dir_data': None,
             'data_cls': None,
         },
-    }
+    },
+    'relationship_loader_train': {
+        'func': rel_data_loader,
+        'params': {
+            'dir_data': None,
+            'data_cls': None,
+        },
+    },
 }

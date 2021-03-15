@@ -5,6 +5,7 @@
 
 from backend import keras
 from keras_bert import load_trained_model_from_checkpoint
+from .layers import NonMaskingLayer
 
 
 def base_embed(base):
@@ -30,3 +31,9 @@ def bert_base(
 
 def get_model(inputs, output):
     return keras.Model(inputs, output)
+
+
+def nonmask_embed(base):
+    output_layer = NonMaskingLayer()(base.output)
+    model = keras.models.Model(base.inputs, output_layer)
+    return model

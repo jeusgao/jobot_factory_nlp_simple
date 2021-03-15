@@ -88,9 +88,9 @@ def _task_management(task_path):
     action = st.sidebar.radio(
         'Actions of task',
         [
-            'Training params configuration',
-            'Train the model',
-            'Evaluate the model',
+            'Task params configuration',
+            'Train the model of task',
+            'Evaluate the task',
             f'Duplicate task - {task_path}',
             f'Remove task - {task_path}',
         ]
@@ -98,26 +98,52 @@ def _task_management(task_path):
 
     is_running = os.path.exists(f'{task_path}/state.json')
 
-    if action == 'Training params configuration':
+    if action == 'Task params configuration':
         st.subheader('Select a params set to customize:')
-        col1, col2, col3, col4 = st.beta_columns(4)
-        if col1.button('Training data'):
-            training_data_params(task_path, is_training=is_running)
 
-        if col2.button('Model params'):
-            model_params(task_path, is_training=is_running)
+        c1, c2, c3, c4 = st.beta_columns(4)
 
-        if col3.button('Taining task'):
-            training_params(task_path, is_training=is_running)
+        def _get_cur():
+            if os.path.exists('_tmp_param_status'):
+                with open('_tmp_param_status', 'r') as f:
+                    _cur = json.load(f).get('_cur', 0)
+                return _cur
+            return 0
 
-        if col4.button('Predictor params'):
-            predict_params(task_path, is_training=is_running)
+        _cur = _get_cur()
 
-    if action == 'Train the model':
+        if c1.button('Training data', key='btn_1'):
+            with open('_tmp_param_status', 'w') as f:
+                json.dump({'_cur': 1}, f)
+            _cur = _get_cur()
+        if c2.button('Model params', key='btn_2'):
+            with open('_tmp_param_status', 'w') as f:
+                json.dump({'_cur': 2}, f)
+            _cur = _get_cur()
+        if c3.button('Taining task', key='btn_3'):
+            with open('_tmp_param_status', 'w') as f:
+                json.dump({'_cur': 3}, f)
+            _cur = _get_cur()
+        if c4.button('Predictor params', key='btn_4'):
+            with open('_tmp_param_status', 'w') as f:
+                json.dump({'_cur': 4}, f)
+            _cur = _get_cur()
+
+        if _cur > 0:
+            if _cur == 1:
+                training_data_params(task_path, is_training=is_running)
+            if _cur == 2:
+                model_params(task_path, is_training=is_running)
+            if _cur == 3:
+                training_params(task_path, is_training=is_running)
+            if _cur == 4:
+                predict_params(task_path, is_training=is_running)
+
+    if action == 'Train the model of task':
         training_gui = TrainingGUI(task_path=task_path, is_running=is_running)
         training_gui.train()
 
-    if action == 'Evaluate the model':
+    if action == 'Evaluate the task':
         if os.path.exists(f'{task_path}/model.h5'):
             training_gui = TrainingGUI(task_path=task_path, is_running=is_running, is_eval=True)
             training_gui.train()
@@ -138,6 +164,11 @@ def _task_management(task_path):
             block_cancel = st.empty()
             _remove_task(task_path, block_title, block_remove, block_cancel)
 
+
+# from init_params import env_init
+# if st.sidebar.button('Init params templates'):
+#     env_init()
+#     st.success('Params templates initialized.')
 
 task_action = st.sidebar.radio('', ['New task', 'Select task from exists', 'Regex test'])
 

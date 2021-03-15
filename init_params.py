@@ -11,10 +11,13 @@ from utils import (
     DIC_Resolvers,
 )
 from modules import(
+    DIC_Funcs,
+    DIC_Inits,
     DIC_Losses,
     DIC_Metrics,
     DIC_Layers,
     DIC_Bases,
+    DIC_Models,
     DIC_Optimizers,
     DIC_Tokenizers,
     DIC_Generators_for_train,
@@ -27,12 +30,14 @@ def _get_dic(_dic):
     for k, v in _dic.items():
         _d[k] = {}
         _d[k]['func'] = ''
-        if v.get('params'):
+        if isinstance(v, dict) and v.get('params'):
             _d[k]['params'] = v.get('params')
     return _d
 
 
 _dics = {
+    'DIC_Funcs': _get_dic(DIC_Funcs),
+    'DIC_Inits': _get_dic(DIC_Inits),
     'DIC_Losses': _get_dic(DIC_Losses),
     'DIC_Metrics': _get_dic(DIC_Metrics),
     'DIC_Layers': _get_dic(DIC_Layers),
@@ -43,6 +48,7 @@ _dics = {
     'DIC_Generators_for_train': _get_dic(DIC_Generators_for_train),
     'DIC_Generators_for_pred': _get_dic(DIC_Generators_for_pred),
     'DIC_Resolvers': _get_dic(DIC_Resolvers),
+    'DIC_Models': _get_dic(DIC_Models),
 }
 
 

@@ -3,7 +3,6 @@
 # @Date    : 2021-01-06 17:28:59
 # @Author  : Joe Gao (jeusgao@163.com)
 
-from collections import namedtuple
 
 from backend import keras
 from utils import get_object, DIC_DataLoaders
@@ -11,23 +10,29 @@ from modules import (
     DIC_Layers,
     DIC_Losses,
     DIC_Metrics,
+    DIC_Models,
     DIC_Bases,
     DIC_Optimizers,
     DIC_Tokenizers,
     NonMaskingLayer,
+    DIC_Funcs,
+    DIC_Inits,
 )
 
 
 def model_builder(
     is_eval=False,
-    TF_KERAS=0,
-    maxlen=64,
-    ML=64,
-    tokenizer_code='tokenizer_zh',
-    tokenizer_params=None,
-    base_code='BERT',
-    base_params=None,
-    model_params=None,
+    maxlen=128,
+    ML=128,
+    tokenizer_code=None,
+    tokenizer_params={'fn_vocab': 'hub/bases/rbtl3/vocab.txt'},
+    obj_common=None,
+    dic_bases=None,
+    dic_embeds=None,
+    list_inputs=None,
+    dic_layers=None,
+    dic_outputs=None,
+    obj_optimizer=None,
 ):
     dic_tokenizer = DIC_Tokenizers.get(tokenizer_code)
     token_dict, tokenizer = get_object(
@@ -35,57 +40,74 @@ def model_builder(
         params=tokenizer_params,
     )
 
-    dic_base = DIC_Bases.get(base_code)
-    base_params['seq_len'] = ML
-    base = get_object(
-        func=dic_base.get('func'),
-        params=base_params,
-    )
+    _model_bases = {
+        k: get_object(
+            func=DIC_Bases.get(v.get('base_code')).get('func'),
+            params={**v.get('base_params'), **{'seq_len': ML}}
+        ) for k, v in dic_bases.items()
+    }
 
-    CFG_MODEL = namedtuple('CFG_MODEL', model_params.keys())
-    cfg_model = CFG_MODEL(**model_params)
+    _model_embeds = {
+        k: DIC_Models.get(v.get('model_type')).get('func')(_model_bases.get(v.get('base'))) for k, v in dic_embeds.items()
+    }
 
-    inputs = base.inputs
-    output = base.output
+    def _get_IOS(_layers, list_IOS, key_type, key, tag):
+        _IOS = []
+        for _d in list_IOS:
+            _IOS_type = _d.get(key_type)
+            _IOS_code = _d.get(key)
 
-    for layer in cfg_model.layers:
-        print(layer)
-        _func = layer.get('func')
-        if _func == 'nonmasking_layer':
-            output_layer = DIC_Layers.get(_func).get('func')(base.output)
-            embed_model = keras.models.Model(base.inputs, output_layer)
-            inputs, output = embed_model.inputs, embed_model.output
-        else:
-            params = layer.get('params', None)
-            if params:
-                output = get_object(
-                    func=DIC_Layers.get(_func).get('func'),
-                    params=params)(output)
-            else:
-                output = DIC_Layers.get(_func).get('func')(output)
-    model = keras.Model(inputs, output)
+            _IO = None
+            if _IOS_type == 'Pretrained':
+                if tag == 'O':
+                    _IO = _model_bases.get(_IOS_code).output
+                else:
+                    _IO = _model_bases.get(_IOS_code).inputs
+            if _IOS_type == 'Embeded':
+                if tag == 'O':
+                    _IO = _model_embeds.get(_IOS_code).output
+                else:
+                    _IO = _model_embeds.get(_IOS_code).inputs
+            if _IOS_type == 'Layer':
+                _IO = _layers.get(_IOS_code)
+            _IOS.append(_IO)
+        return _IOS
 
-    _loss = cfg_model.loss
-    loss = DIC_Losses.get(_loss.get('func')).get('func')
-    if 'params' in _loss.keys():
-        loss = get_object(func=loss, params=_loss.get('params'))
+    _model_layers = {}
+    for k, v in dic_layers.items():
+        _layer_type = DIC_Layers.get(v.get('layer')).get('func')
 
-    metrics = cfg_model.metrics
-    metrics = [
-        get_object(func=DIC_Metrics.get(m.get('func')).get('func'), params=m.get('params'))
-        if 'params' in DIC_Metrics.get(m.get('func')).keys()
-        else DIC_Metrics.get(m.get('func')).get('func')
-        for m in metrics
-    ]
+        _params = v.get('params')
 
-    _optimizer = cfg_model.optimizer
-    optimizer = DIC_Optimizers.get(_optimizer.get('func'))
-    optimizer = get_object(func=optimizer.get('func'), params=_optimizer.get('params'))
+        if _params and 'kernel_initializer' in _params:
+            _params['kernel_initializer'] = DIC_Inits.get(_params.get('kernel_initializer')).get('func')()
+
+        if _params and isinstance(_params, str):
+            _params = DIC_Funcs.get(_params)
+
+        _inputs = _get_IOS(_model_layers, v.get('layer_inputs'), 'inputs_type', 'inputs', 'O')
+        if len(_inputs) == 1:
+            _inputs = _inputs[0]
+
+        _layer = get_object(func=_layer_type if _params or 'lambda' in v.get(
+            'layer') or 'crf' in v.get('layer') else _layer_type(), params=_params)(_inputs)
+        _model_layers[k] = _layer
+
+    _model_inputs = _get_IOS(_model_layers, list_inputs, 'inputs_type', 'inputs', 'I')
+    _model_outputs = _get_IOS(_model_layers, dic_outputs.values(), 'output_type', 'output', 'O')
+    _model_losses = [DIC_Losses.get(v.get('loss')).get('func') for v in dic_outputs.values()]
+    _model_metrics = [[DIC_Metrics.get(_metric).get('func') for _metric in v.get('metrics')]
+                      for v in dic_outputs.values()]
+
+    model = keras.Model(_model_inputs, _model_outputs)
+    optimizer = get_object(func=DIC_Optimizers.get(obj_optimizer.func).get('func'), params=obj_optimizer.params)
+    _model_loss_weights = [1., 1.] if is_eval else obj_optimizer.loss_weights
 
     model.compile(
         optimizer='adam' if is_eval else optimizer,
-        loss=loss,
-        metrics=metrics,
+        loss=_model_losses,
+        loss_weights=_model_loss_weights,
+        metrics=_model_metrics,
     )
 
     # model.summary()
@@ -107,9 +129,9 @@ def train_data_builder(
     batch_size=128,
 ):
     data_loader = DIC_DataLoaders.get(data_loader_params.get('func')).get('func')
-    data_loader_params = data_loader_params.get('params')
+    # data_loader_params = data_loader_params.get('params')
 
-    _x, _y = data_loader(**{**{'fns': fns}, **data_loader_params})
+    _x, _y = data_loader(**{'fns': fns})
     _steps = len(_x) // batch_size
 
     return _x, _y, _steps

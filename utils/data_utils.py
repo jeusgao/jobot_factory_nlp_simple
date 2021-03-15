@@ -2,11 +2,13 @@
 # @Date    : 2021-01-04 14:51:37
 # @Author  : Joe Gao (jeusgao@163.com)
 
+import json
 import pandas as pd
+from tqdm import tqdm
 from sklearn.utils import shuffle
 
 
-def sentences_loader_train(fns=None, dir_data=None, data_cls=None, t1='q1', t2=None, label='label'):
+def sentences_loader_train(fns=None, t1='q1', t2=None, label='label'):
     q1s, q2s, labels = [], [], []
     for fn in fns:
         sep = '\t' if fn.endswith('tsv') else ','
@@ -25,7 +27,7 @@ def sentences_loader_train(fns=None, dir_data=None, data_cls=None, t1='q1', t2=N
     return data_x, labels
 
 
-def sequences_loader_train(fns=None, dir_data=None, data_cls=None):
+def sequences_loader_train(fns=None):
     data_x, data_y = [], []
     for fn in fns:
         with open(fn, 'r', encoding='utf-8') as f:
@@ -44,4 +46,30 @@ def sequences_loader_train(fns=None, dir_data=None, data_cls=None):
             elif len(row) == 2:
                 x.append(row[0])
                 y.append(row[1])
+    return data_x, data_y
+
+
+def rel_data_loader(fns=None):
+    data_x, data_y = [], []
+    for fn in fns:
+        with open(fn, 'r') as f:
+            lines = json.load(f)
+        for line in tqdm(lines, total=len(lines)):
+            text = line.get('text')
+            dic_rels = line.get('rels')
+            dic_pairs = {}
+            for k in dic_rels:
+                obj_word, pos, n_rel = dic_rels.get(k).values()
+                obj_pos = (pos, pos + len(obj_word))
+                subj_word, pos, _ = dic_rels.get(str(n_rel)).values()
+                subj_pos = (pos, pos + len(subj_word))
+
+                if subj_pos in dic_pairs:
+                    dic_pairs[subj_pos].append((obj_pos, obj_word))
+                else:
+                    dic_pairs[subj_pos] = [(obj_pos, obj_word)]
+
+            data_x.append(text)
+            data_y.append(dic_pairs)
+
     return data_x, data_y

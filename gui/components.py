@@ -7,6 +7,53 @@ import os
 import streamlit as st
 
 
+def crud(c2, params, func, func_params, tag):
+    _action = c2.radio('', ['New', 'Edit', 'Remove'])
+    _msg, flag, is_delete = None, False, False
+
+    if _action == 'New':
+        _key = c2.text_input('Input a new name:', '').strip()
+        if not len(_key):
+            return False, None, 'Input a name please.', is_delete
+        elif _key in params:
+            return False, None, f'Duplcated name - [{_key}] .', is_delete
+        else:
+            func_params['_key'] = _key
+            _dic = func(**func_params)
+            flag = True
+            _msg = f'{tag} params saved.'
+
+    if _action == 'Edit':
+        if not params:
+            return False, None, f'{tag} not found.', is_delete
+        else:
+            _options = list(params.keys())
+            if _options:
+                _key = c2.selectbox('Select name to edit:', _options, 0)
+                func_params['_key'] = _key
+                _dic = func(**func_params)
+                flag = True
+                _msg = f'{tag} params saved.'
+
+    if _action == 'Remove':
+        is_delete = True
+        if not params:
+            return False, None, f'{tag} not found.', is_delete
+        else:
+            _options = list(params.keys())
+            _dic = {k: v for k, v in params.items()}
+
+            if _options:
+                _key = c2.selectbox('Select name to remove:', _options, 0)
+
+            if c2.button('remove'):
+                del _dic[_key]
+                _msg = f'Selected {tag} removed from this model.'
+                flag = True
+
+    return flag, _dic, _msg, is_delete
+
+
 def get_default_input(_default, params, tag, sub_tag=None):
     if params:
         _tmp = params.get(tag).get(sub_tag) if sub_tag else params.get(tag)
@@ -64,7 +111,7 @@ def multi_options(task_path, tag, options, main_dic, _default=None, fn=None, is_
     if is_set:
         _keys = st.multiselect(
             tag, options,
-            default=_default if set(options).intersection(set(_default)) else options[0],
+            default=_default if _default and set(options).intersection(set(_default)) else options[0],
             key=tag,
         )
     else:
