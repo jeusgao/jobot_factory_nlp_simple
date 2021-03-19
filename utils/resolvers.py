@@ -111,6 +111,15 @@ def resolve_spo(pred, text, **params):
     for i, scores in enumerate(pred_rels):
         for j, score in enumerate(scores):
             if score > 0:
-                rels.append({'from_word': words.get(j), 'pos': j, 'to_word': words.get(i), 'pos': i})
+                rels.append({
+                    'from_word': words.get(j),
+                    'from_pos': j,
+                    'to_word': words.get(i),
+                    'to_pos': i,
+                    'tensors': {
+                        'object': pred[2][0][j:j + len(words.get(j))],
+                        'subject': pred[2][0][i:i + len(words.get(i))]
+                    }
+                })
 
     return {'text': text, 'words': words, 'rels': rels}

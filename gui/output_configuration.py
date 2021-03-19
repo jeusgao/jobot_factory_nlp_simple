@@ -13,6 +13,9 @@ def output_conf(c2, _dic, _dic_outputs_types, _key, _model_output_params, DIC_Lo
     _dic_value = {}
     _model_output_value_params = _model_output_params.get(_key, {}) if _model_output_params else {}
 
+    _options, _default = [False, True], _model_output_value_params.get('for_pred_only', False)
+    _dic_value['for_pred_only'] = c2.selectbox('is output for predictor only', _options, _options.index(_default))
+
     _options, _default = get_default(_model_output_value_params, _dic_outputs_types, 'output_type')
     _outputs_type = c2.selectbox('model output type', _options, _options.index(_default))
     _dic_value['output_type'] = _outputs_type
@@ -24,7 +27,7 @@ def output_conf(c2, _dic, _dic_outputs_types, _key, _model_output_params, DIC_Lo
     _dic_value['output'] = c2.selectbox('model output', _options, _default)
 
     _options, _default = get_default(_model_output_value_params, DIC_Losses, 'loss')
-    _dic_value['loss'] = c2.selectbox('model output loss', _options, _options.index(_default))
+    _dic_value['loss'] = c2.selectbox('model output loss', _options + [None], _options.index(_default))
 
     _options = list(DIC_Metrics.keys())
     _default = _model_output_value_params.get('metrics', [])

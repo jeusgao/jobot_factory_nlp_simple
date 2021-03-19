@@ -70,7 +70,10 @@ def model_builder(
                     _IO = _model_embeds.get(_IOS_code).inputs
             if _IOS_type == 'Layer':
                 _IO = _layers.get(_IOS_code)
-            _IOS.append(_IO)
+
+            if is_eval or (not is_eval and _d.get('for_pred_only')):
+                _IOS.append(_IO)
+
         return _IOS
 
     _model_layers = {}
@@ -97,7 +100,7 @@ def model_builder(
     _model_outputs = _get_IOS(_model_layers, dic_outputs.values(), 'output_type', 'output', 'O')
     _model_losses = [DIC_Losses.get(v.get('loss')).get('func') for v in dic_outputs.values()]
     _model_metrics = [[DIC_Metrics.get(_metric).get('func') for _metric in v.get('metrics')]
-                      for v in dic_outputs.values()]
+                      for v in dic_outputs.values() if len(v.get('metrics')) > 0]
 
     model = keras.Model(_model_inputs, _model_outputs)
     optimizer = get_object(func=DIC_Optimizers.get(obj_optimizer.func).get('func'), params=obj_optimizer.params)

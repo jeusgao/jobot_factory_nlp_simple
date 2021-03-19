@@ -65,10 +65,23 @@ def _duplicate_task(task_path, new_name, block_ok):
         if _name:
             if not os.path.exists(f'hub/models/{_name}'):
                 os.makedirs(f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_bases_params.json'):
+                    shutil.copy(f'{task_path}/model_bases_params.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_common_params.json'):
+                    shutil.copy(f'{task_path}/model_common_params.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_embeded_params.json'):
+                    shutil.copy(f'{task_path}/model_embeded_params.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_inputs_params.json'):
+                    shutil.copy(f'{task_path}/model_inputs_params.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_layer_params.json'):
+                    shutil.copy(f'{task_path}/model_layer_params.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_optimizer_params.json'):
+                    shutil.copy(f'{task_path}/model_optimizer_params.json', f'hub/models/{_name}')
+                if os.path.exists(f'{task_path}/model_outputs_params.json'):
+                    shutil.copy(f'{task_path}/model_outputs_params.json', f'hub/models/{_name}')
+
                 if os.path.exists(f'{task_path}/params_data.json'):
                     shutil.copy(f'{task_path}/params_data.json', f'hub/models/{_name}')
-                if os.path.exists(f'{task_path}/params_model.json'):
-                    shutil.copy(f'{task_path}/params_model.json', f'hub/models/{_name}')
                 if os.path.exists(f'{task_path}/params_train.json'):
                     shutil.copy(f'{task_path}/params_train.json', f'hub/models/{_name}')
                 if os.path.exists(f'{task_path}/params_pred.json'):
