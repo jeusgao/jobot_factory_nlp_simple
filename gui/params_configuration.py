@@ -329,8 +329,7 @@ def model_params(task_path, is_training=False):
         _index = _options.index(_default)
 
         _dic = {}
-        c1, c2 = st.beta_columns([1, 3])
-        _option = c1.selectbox('Select an optimizer:', _options, index=_index)
+        _option = c2.selectbox('Select an optimizer:', _options, index=_index)
         _dic['func'] = _option
         if not _params:
             _params = DIC_Optimizers.get(_option).get('params')
@@ -341,7 +340,7 @@ def model_params(task_path, is_training=False):
             c2.write(f'{_option}: None params')
 
         _default = _model_optimizer_params.get('loss_weights', []) if _model_optimizer_params else [1, 1]
-        _loss_weights = st.text_input('model loss weights:', _default).strip()
+        _loss_weights = c2.text_input('model loss weights:', _default).strip()
 
         _dic['loss_weights'] = None if not len(_loss_weights) or _loss_weights == 'None' else eval(_loss_weights)
 
