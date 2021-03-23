@@ -129,6 +129,7 @@ def model_params(task_path, is_training=False):
 
     if _choice == 'Embeded Models':
         _base_model_params = get_dic_from_json(f'{task_path}/model_bases_params.json')
+        _embeded_model_params = None
         if _base_model_params:
             _embeded_model_params = get_dic_from_json(f'{task_path}/model_embeded_params.json')
             _options, _dic = None, {}
@@ -339,7 +340,7 @@ def model_params(task_path, is_training=False):
         else:
             c2.write(f'{_option}: None params')
 
-        _default = _model_optimizer_params.get('loss_weights', [])
+        _default = _model_optimizer_params.get('loss_weights', []) if _model_optimizer_params else [1, 1]
         _loss_weights = st.text_input('model loss weights:', _default).strip()
 
         _dic['loss_weights'] = None if not len(_loss_weights) or _loss_weights == 'None' else eval(_loss_weights)
