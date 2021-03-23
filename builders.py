@@ -22,6 +22,7 @@ from modules import (
 
 def model_builder(
     is_eval=False,
+    is_predict=False,
     maxlen=128,
     ML=128,
     tokenizer_code=None,
@@ -71,7 +72,7 @@ def model_builder(
             if _IOS_type == 'Layer':
                 _IO = _layers.get(_IOS_code)
 
-            if is_eval or (not is_eval and _d.get('for_pred_only')):
+            if is_predict or (not is_predict and not _d.get('for_pred_only')):
                 _IOS.append(_IO)
 
         return _IOS
@@ -98,7 +99,7 @@ def model_builder(
 
     _model_inputs = _get_IOS(_model_layers, list_inputs, 'inputs_type', 'inputs', 'I')
     _model_outputs = _get_IOS(_model_layers, dic_outputs.values(), 'output_type', 'output', 'O')
-    _model_losses = [DIC_Losses.get(v.get('loss')).get('func') for v in dic_outputs.values()]
+    _model_losses = [DIC_Losses.get(v.get('loss')).get('func') for v in dic_outputs.values() if v.get('loss')]
     _model_metrics = [[DIC_Metrics.get(_metric).get('func') for _metric in v.get('metrics')]
                       for v in dic_outputs.values() if len(v.get('metrics')) > 0]
 

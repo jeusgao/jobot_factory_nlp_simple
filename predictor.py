@@ -31,7 +31,6 @@ def _get_params(
 class Predictor(object):
     def __init__(self, api_name):
         task_path = f'hub/models/{api_name}'
-        # fn_model, params_model, params_data, _, params_pred = task_init(task_path, is_train=False)
         fn_model, dic_task_params = task_init(task_path, is_train=False)
 
         model_bases_params, model_common_params, model_embeded_params, model_inputs_params, model_layer_params, model_outputs_params, model_optimizer_params, params_data, params_train, params_pred = _get_params(
@@ -69,7 +68,7 @@ class Predictor(object):
         params_model['dic_outputs'] = model_outputs_params
         params_model['obj_optimizer'] = model_optimizer_params
 
-        self.tokenizer, self.token_dict, self.model = model_builder(is_eval=True, **params_model)
+        self.tokenizer, self.token_dict, self.model = model_builder(is_predict=True, **params_model)
         # self.model.summary()
         self.model.load_weights(fn_model)
 
