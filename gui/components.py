@@ -63,8 +63,11 @@ def get_default_input(_default, params, tag, sub_tag=None):
 
 
 def get_default(params, dic, tag, is_num=False):
-    _options = list(dic.keys())
-    _default = 0 if is_num else _options[0]
+    _options = list(dic.keys()) if dic else []
+    if _options:
+        _default = 0 if is_num else _options[0]
+    else:
+        _default = None
     if params:
         if is_num:
             _tmp = params.get(tag)

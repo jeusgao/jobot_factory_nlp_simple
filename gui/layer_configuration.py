@@ -74,7 +74,7 @@ def add_layer(c2, st, _dic_inputs_types, _model_layer_params, DIC_Layers):
     _key = c2.text_input('Input a new name:', '').strip()
     if not len(_key):
         return False, 'Input a name please.'
-    if _key in _model_layer_params:
+    if _model_layer_params and _key in _model_layer_params:
         return False, f'Duplcated name - [{_key}] .'
 
     _dic = {k: v for k, v in _model_layer_params.items()} if _model_layer_params else {}

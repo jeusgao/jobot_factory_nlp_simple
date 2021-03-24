@@ -161,6 +161,8 @@ def model_params(task_path, is_training=False):
             else:
                 if _msg:
                     c2.warning(_msg)
+        else:
+            c2.warning('Pretrained model not found.')
         st.write(_embeded_model_params)
 
     if _choice == 'Model Layers':
