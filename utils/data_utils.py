@@ -2,10 +2,27 @@
 # @Date    : 2021-01-04 14:51:37
 # @Author  : Joe Gao (jeusgao@163.com)
 
+import re
 import json
 import pandas as pd
 from tqdm import tqdm
 from sklearn.utils import shuffle
+
+p_all_sent = re.compile(r'^.*[。？\?！!；～〜…]+')
+
+
+def sent_cut_zh(zh_text, cut_chars=100):
+    """return full sentences at most #cut_chars Chinese characters.
+
+    arguments:
+    zh_text -- the input text string. have to be Chinese!
+    cut_chars -- the maximum Chinese characters to keep (default 100)
+    """
+    m_all_sent = p_all_sent.match(zh_text, 0, cut_chars)
+    if m_all_sent:
+        return m_all_sent.group(0)
+    else:
+        return zh_text[:cut_chars]
 
 
 def sentences_loader_train(fns=None, t1='q1', t2=None, label='label'):

@@ -109,7 +109,7 @@ def resolve_spo(pred, text, **params):
     pred_rels = pred[1][0].argmax(axis=-1).tolist()
     rels = []
 
-    for i, (_max, scores) in enumerate(zip(pred_rels, pred[1][0])):
+    for i, (_max, scores) in enumerate(zip(pred_rels[:len(text)], pred[1][0][:len(text)])):
         for j, m in enumerate(_max):
             if m > 0:
                 if not j == i and words.get(i) and words.get(j):
@@ -118,10 +118,10 @@ def resolve_spo(pred, text, **params):
                         'from_pos': j,
                         'to_word': words.get(i),
                         'to_pos': i,
-                        'score:': scores[j][m],
+                        'score:': scores[j, m].tolist(),
                         'tensors': {
                             'object': np.sum(pred[2][0][j:j + len(words.get(j))], axis=0).tolist(),
-                            'subject': np.sum(pred[2][0][i:i + len(words.get(i))], axis=0).tolist()
+                            'subject': np.sum(pred[2][0][i:i + len(words.get(i))], axis=0).tolist(),
                         }
                     })
 
