@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2021-01-06 17:28:59
 # @Author  : Joe Gao (jeusgao@163.com)
-
+import numpy as np
 
 from backend import keras
 from utils import get_object, DIC_DataLoaders
@@ -50,7 +50,7 @@ def model_builder(
 
     _model_embeds = {
         k: DIC_Models.get(v.get('model_type')).get('func')(_model_bases.get(v.get('base'))) for k, v in dic_embeds.items()
-    }
+    } if dic_embeds else None
 
     def _get_IOS(_layers, list_IOS, key_type, key, tag):
         _IOS = []
@@ -64,7 +64,7 @@ def model_builder(
                     _IO = _model_bases.get(_IOS_code).output
                 else:
                     _IO = _model_bases.get(_IOS_code).inputs
-            if _IOS_type == 'Embeded':
+            if _IOS_type == 'Embeded' and _model_embeds:
                 if tag == 'O':
                     _IO = _model_embeds.get(_IOS_code).output
                 else:
@@ -105,7 +105,8 @@ def model_builder(
 
     model = keras.Model(_model_inputs, _model_outputs)
     optimizer = get_object(func=DIC_Optimizers.get(obj_optimizer.func).get('func'), params=obj_optimizer.params)
-    _model_loss_weights = [1., 1.] if is_eval else obj_optimizer.loss_weights
+    _model_loss_weights = list(np.ones(len(_model_outputs))
+                               ) if is_eval or not obj_optimizer.loss_weights else obj_optimizer.loss_weights
 
     model.compile(
         optimizer='adam' if is_eval else optimizer,

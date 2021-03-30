@@ -79,6 +79,9 @@ class Predictor(object):
         elif len(inputs) > 1:
             inputs = ['.'.join(inputs)]
 
+        if len(inputs)<1:
+            return {'result':'Inputs invalid.'}
+
         data_input = self.data_generator(
             data=inputs,
             tokenizer=self.tokenizer,

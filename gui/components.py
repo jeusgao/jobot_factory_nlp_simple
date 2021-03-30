@@ -15,7 +15,7 @@ def crud(c2, params, func, func_params, tag):
         _key = c2.text_input('Input a new name:', '').strip()
         if not len(_key):
             return False, None, 'Input a name please.', is_delete
-        elif _key in params:
+        elif params and _key in params:
             return False, None, f'Duplcated name - [{_key}] .', is_delete
         else:
             func_params['_key'] = _key
@@ -100,7 +100,10 @@ def single_option(tag, dic, main_dic, _options, _params=None, _index=0):
     if not _params:
         _params = dic.get(_option).get('params')
     if _params:
-        _params = eval(col2.text_input(f'{_option} params:', _params))
+        try:
+            _params = eval(col2.text_input(f'{_option} params:', _params))
+        except Exception as err:
+            col2.error(f'{err}, Check your input please...')
         dic[_option]['params'] = _params
         main_dic[tag] = {'func': _option, 'params': _params}
     else:
@@ -149,7 +152,10 @@ def multi_options(task_path, tag, options, main_dic, _default=None, fn=None, is_
                         _params = _ori_funcs[i]
 
             if _params or _params.get('params'):
-                _params = eval(st.text_input(f'{key} params:', _params.get('params'), key=f'{tag}_{key}_params_{i}'))
+                try:
+                    _params = eval(st.text_input(f'{key} params:', _params.get('params'), key=f'{tag}_{key}_params_{i}'))
+                except Exception as err:
+                    st.error(f'{err}, Check your input please...')
             else:
                 st.write(f'{key}: None param')
                 _params = None

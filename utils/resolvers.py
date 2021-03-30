@@ -118,7 +118,7 @@ def resolve_spo(pred, text, **params):
                         'from_pos': j,
                         'to_word': words.get(i),
                         'to_pos': i,
-                        'score:': scores[j, m].tolist(),
+                        'score': scores[j, m].tolist(),
                         'tensors': {
                             'object': np.sum(pred[2][0][j:j + len(words.get(j))], axis=0).tolist(),
                             'subject': np.sum(pred[2][0][i:i + len(words.get(i))], axis=0).tolist(),

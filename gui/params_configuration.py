@@ -84,7 +84,7 @@ def model_params(task_path, is_training=False):
 
             _default = True
             if _common_params and 'is_pair' in _common_params:
-                _default = False
+                _default = _common_params.get('is_pair')
 
             is_pair = st.radio('is pair inputs', [True, False], [True, False].index(_default))
             _dic['ML'] = maxlen * 2 + 3 if is_pair else maxlen
@@ -93,7 +93,9 @@ def model_params(task_path, is_training=False):
         c2.subheader('')
         if not is_training and c2.button('save'):
             dump_json(f'{task_path}/model_common_params.json', _dic)
+            _common_params = _dic
             c2.success('Params saved.')
+        st.write(_common_params)
 
     if _choice == 'Pretrained Models':
         _pretrained_model_params = get_dic_from_json(f'{task_path}/model_bases_params.json')
@@ -336,17 +338,26 @@ def model_params(task_path, is_training=False):
         if not _params:
             _params = DIC_Optimizers.get(_option).get('params')
         if _params:
-            _params = eval(c2.text_input(f'{_option} params:', _params))
-            _dic['params'] = _params
+            try:
+                _params = eval(c2.text_input(f'{_option} params:', _params))
+                _dic['params'] = _params
+            except Exception as err:
+                c2.error(f'{err}, Check your input please...')
         else:
             c2.write(f'{_option}: None params')
 
         _default = _model_optimizer_params.get('loss_weights', []) if _model_optimizer_params else [1, 1]
         _loss_weights = c2.text_input('model loss weights:', _default).strip()
 
-        _dic['loss_weights'] = None if not len(_loss_weights) or _loss_weights == 'None' else eval(_loss_weights)
+        if not len(_loss_weights) or _loss_weights == 'None':
+            _dic['loss_weights'] = None
+        else:
+            try:
+                eval(_loss_weights)
+            except Exception as err:
+                c2.error(f'{err}, Check your input please...')
 
-        if st.button('save'):
+        if c2.button('save'):
             dump_json(f'{task_path}/model_optimizer_params.json', _dic)
             _model_optimizer_params = _dic
             st.success('Model optimizer saved.')

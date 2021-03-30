@@ -4,9 +4,13 @@ keras-bert  # 0.83 if tf < 2.3 else ...
 keras-metrics
 numpy
 pandas
+# pydantic
+pymilvus
 sklearn
 tensorflow
 tensorflow_addons
 tqdm
 uvicorn
+zc.zlibstorage
+ZODB
 git+https://www.github.com/keras-team/keras-contrib.git

@@ -29,9 +29,9 @@ class TrainingGUI(object):
         self._action = 'evaluating' if is_eval else 'training'
         self.fn_model = f'{task_path}/model.h5'
         self.is_configed = all([
-            os.path.exists(f'{task_path}/common_params.json'),
+            os.path.exists(f'{task_path}/model_common_params.json'),
             os.path.exists(f'{task_path}/model_bases_params.json'),
-            os.path.exists(f'{task_path}/model_embeded_params.json'),
+            # os.path.exists(f'{task_path}/model_embeded_params.json'),
             os.path.exists(f'{task_path}/model_inputs_params.json'),
             os.path.exists(f'{task_path}/model_layer_params.json'),
             os.path.exists(f'{task_path}/model_outputs_params.json'),
@@ -172,13 +172,6 @@ class TrainingGUI(object):
         if not self.is_configed:
             st.warning('Task params not found, please customize the params for the task first.')
         else:
-            # params = {
-            #     'target_path': self.task_path,
-            #     'params_model': get_params(f'{self.task_path}/params_model.json'),
-            #     'params_data': get_params(f'{self.task_path}/params_data.json'),
-            #     'params_train': get_params(f'{self.task_path}/params_train.json'),
-            # }
-
             _state = get_key_from_json(self.fn_state, f'{self._action}_state')
 
             if not self.is_running:

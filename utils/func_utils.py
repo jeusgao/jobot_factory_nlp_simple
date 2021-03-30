@@ -39,8 +39,11 @@ def task_init(task_path, is_train=True):
     with open(f'{task_path}/model_common_params.json') as f:
         dic_task_params['model_common_params'] = get_namedtuple('model_common_params', json.load(f))
 
-    with open(f'{task_path}/model_embeded_params.json') as f:
-        dic_task_params['model_embeded_params'] = json.load(f)
+    if os.path.exists(f'{task_path}/model_embeded_params.json'):
+        with open(f'{task_path}/model_embeded_params.json') as f:
+            dic_task_params['model_embeded_params'] = json.load(f)
+    else:
+        dic_task_params['model_embeded_params'] = None
 
     with open(f'{task_path}/model_inputs_params.json') as f:
         dic_task_params['model_inputs_params'] = json.load(f)

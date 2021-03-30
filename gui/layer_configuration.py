@@ -54,7 +54,10 @@ def layer_conf(c2, st, _dic, _dic_inputs_types, _key, _model_layer_params, DIC_L
         _layer_params = None
     if _layer_params:
         if '{' in _layer_params or '[' in _layer_params:
-            _dic_value['params'] = eval(_layer_params)
+            try:
+                _dic_value['params'] = eval(_layer_params)
+            except Exception as err:
+                c2.error(f'{err}, Check your input please...')
         else:
             _dic_value['params'] = _layer_params
 

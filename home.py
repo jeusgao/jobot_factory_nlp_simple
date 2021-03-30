@@ -183,7 +183,7 @@ def _task_management(task_path):
 #     env_init()
 #     st.success('Params templates initialized.')
 
-task_action = st.sidebar.radio('', ['New task', 'Select task from exists', 'Regex test'])
+task_action = st.sidebar.radio('', ['New task', 'Select task from exists', 'Regex test', 'KE'])
 
 if task_action == 'New task':
     _create_task()

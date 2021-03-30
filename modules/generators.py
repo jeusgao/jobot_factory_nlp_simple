@@ -96,7 +96,10 @@ def data_generator_train(
             D = data[start_index: end_index]
             Y = y_data[start_index: end_index]
 
-            ML = max([len(d[0][:maxlen]) for d in D])
+            # ML = max([len(d[0][:maxlen]) for d in D])
+            ML = maxlen
+            if not is_sequence:
+                ML = ML * 2 + 3
 
             X, X_seg = [], []
             for d in D:
