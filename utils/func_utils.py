@@ -101,10 +101,11 @@ def get_key_from_json(fn, key):
 
 
 def kill_process(fn):
-    with open(fn, 'r') as f:
-        pid = f.read()
-    cmd = f'kill -9 {pid}'
-    os.system(cmd)
+    if os.path.exists(fn):
+        with open(fn, 'r') as f:
+            pid = f.read()
+        cmd = f'kill -9 {pid}'
+        os.system(cmd)
 
 
 def dump_json(fn, dic):

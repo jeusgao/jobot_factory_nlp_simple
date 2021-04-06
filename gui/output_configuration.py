@@ -27,7 +27,8 @@ def output_conf(c2, _dic, _dic_outputs_types, _key, _model_output_params, DIC_Lo
     _dic_value['output'] = c2.selectbox('model output', _options, _default)
 
     _options, _default = get_default(_model_output_value_params, DIC_Losses, 'loss')
-    _dic_value['loss'] = c2.selectbox('model output loss', _options + [None], _options.index(_default))
+    _options = _options + [None]
+    _dic_value['loss'] = c2.selectbox('model output loss', _options, _options.index(_default))
 
     _options = list(DIC_Metrics.keys())
     _default = _model_output_value_params.get('metrics', [])

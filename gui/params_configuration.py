@@ -353,7 +353,7 @@ def model_params(task_path, is_training=False):
             _dic['loss_weights'] = None
         else:
             try:
-                eval(_loss_weights)
+                _dic['loss_weights'] = eval(_loss_weights)
             except Exception as err:
                 c2.error(f'{err}, Check your input please...')
 
@@ -462,8 +462,11 @@ def training_data_params(task_path, is_training=False):
 
     st.subheader('')
     if not is_training and st.button('save'):
+        _training_data_params = _dic_data
         dump_json(f'{task_path}/params_data.json', _dic_data)
         st.success('Params saved.')
+
+    st.write(_training_data_params)
 
 
 def training_params(task_path, is_training=False):
@@ -508,8 +511,11 @@ def training_params(task_path, is_training=False):
     _dic_train['early_stopping']['patience'] = _patience
 
     if not is_training and st.button('save'):
+        _training_params = _dic_train
         dump_json(f'{task_path}/params_train.json', _dic_train)
         st.success('Params saved.')
+
+    st.write(_training_params)
 
 
 def predict_params(task_path, is_training=False):

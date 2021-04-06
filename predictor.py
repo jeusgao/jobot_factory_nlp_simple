@@ -72,15 +72,15 @@ class Predictor(object):
         # self.model.summary()
         self.model.load_weights(fn_model)
 
-    def predict(self, inputs):
+    def predict(self, inputs, from_api=True):
         if self.is_pair:
             if len(inputs) < 2:
                 return {'result': 'Not enough inputs.'}
         elif len(inputs) > 1:
             inputs = ['.'.join(inputs)]
 
-        if len(inputs)<1:
-            return {'result':'Inputs invalid.'}
+        if len(inputs) < 1:
+            return {'result': 'Inputs invalid.'}
 
         data_input = self.data_generator(
             data=inputs,
@@ -91,7 +91,8 @@ class Predictor(object):
             is_sequence=self.is_sequence,
         )
         pred = self.model.predict(data_input)
-        rst = self.resolver(pred, inputs, activation=self.activation, labeler=self.labeler, is_sequence=self.is_sequence)
+        rst = self.resolver(pred, inputs, from_api=from_api, activation=self.activation,
+                            labeler=self.labeler, is_sequence=self.is_sequence)
         return rst
 
 
@@ -102,7 +103,7 @@ DIC_Predictors = {
 }
 
 
-def main(api_name, input1, input2=None):
+def main(api_name, input1, input2=None, from_api=True):
     if not len(input1.strip()):
         return {'result': 'Empty input(s).'}
 
@@ -110,6 +111,6 @@ def main(api_name, input1, input2=None):
     if input2 and len(input2.strip()):
         inputs.append(input2)
     predictor = DIC_Predictors.get(api_name)
-    rst = predictor.predict(inputs)
+    rst = predictor.predict(inputs, from_api=from_api)
 
     return rst

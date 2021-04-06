@@ -58,7 +58,7 @@ def _resolve_sequence(
     return rst_ner
 
 
-def resolve(pred, text, activation='sigmoid', labeler=None, is_sequence=False, threshold=0.7):
+def resolve(pred, text, from_api=True, activation='sigmoid', labeler=None, is_sequence=False, threshold=0.7):
     rst = None
     score = None
     if is_sequence:
@@ -86,7 +86,7 @@ def resolve(pred, text, activation='sigmoid', labeler=None, is_sequence=False, t
     return {'result': rst, 'score': score}
 
 
-def resolve_spo(pred, text, **params):
+def resolve_spo(pred, text, from_api=True, **params):
     text = text[0]
     pred_words = pred[0][0].argmax(axis=-1).tolist()[:len(text)]
 
@@ -113,15 +113,18 @@ def resolve_spo(pred, text, **params):
         for j, m in enumerate(_max):
             if m > 0:
                 if not j == i and words.get(i) and words.get(j):
+                    _score = scores[j, m].tolist()
                     rels.append({
                         'from_word': words.get(j),
                         'from_pos': j,
                         'to_word': words.get(i),
                         'to_pos': i,
-                        'score': scores[j, m].tolist(),
-                        'tensors': {
-                            'object': np.sum(pred[2][0][j:j + len(words.get(j))], axis=0).tolist(),
-                            'subject': np.sum(pred[2][0][i:i + len(words.get(i))], axis=0).tolist(),
+                        'score': _score,
+                        'tensors': {} if from_api else {
+                            # 'object': np.mean(pred[2][0][j:j + len(words.get(j))], axis=0).tolist(),
+                            # 'subject': np.mean(pred[2][0][i:i + len(words.get(i))], axis=0).tolist(),
+                            'object': pred[2][0][j:j + len(words.get(j))].tolist(),
+                            'subject': pred[2][0][i:i + len(words.get(i))].tolist(),
                         }
                     })
 

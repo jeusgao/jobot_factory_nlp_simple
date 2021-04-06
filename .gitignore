@@ -6,6 +6,7 @@ load_ttl.py
 logs/
 sftp-config.json
 test*
+../bak_*
 .DS_Store
 ../.DS_Store
 __pycache__/

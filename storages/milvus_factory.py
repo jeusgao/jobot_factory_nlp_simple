@@ -7,12 +7,14 @@ import os
 import time
 from milvus import Milvus, IndexType, MetricType, Status
 
+dim = 1024
+
 
 class MilvusFactory(object):
     def __init__(self, host='127.0.0.1', port='9058'):
         self.db = Milvus(host, port)
 
-    def build_collection(self, collection_name='dependency', partition_tag='202103', dim=2048, index_file_size=1024):
+    def build_collection(self, collection_name='dependency', partition_tag='202103', dim=dim, index_file_size=1024):
         param = {
             'collection_name': collection_name,
             'dimension': dim,
@@ -27,7 +29,7 @@ class MilvusFactory(object):
         index_param = {"M": 32, "efConstruction": 256}
         self.db.create_index(collection_name, IndexType.HNSW, index_param)
 
-    def insert(self, vecs, collection_name='dependency', partition_tag='202103', dim=2048, index_file_size=1024):
+    def insert(self, vecs, collection_name='dependency', partition_tag='202103', dim=dim, index_file_size=1024):
         _, ok = self.db.has_collection(collection_name)
         if not ok:
             self.build_collection(
@@ -43,7 +45,9 @@ class MilvusFactory(object):
 
     def search(self, query_vectors, collection_name='dependency', partition_tags=None, top_k=5):
         search_param = {
-            "ef": 16384
+            "ef": 16384,
+            # "nprobe": 8192
+            # "search_k": top_k * 768
         }
 
         st = time.time()

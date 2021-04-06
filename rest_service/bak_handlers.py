@@ -5,7 +5,6 @@
 import os
 import numpy as np
 from fastapi import FastAPI
-from itertools import product
 
 from predictor import main
 from storages import DIC_ZODB, milvusDB
@@ -22,6 +21,30 @@ zodb_code = 'dependency'
 
 db = DIC_ZODB.get(zodb_code)
 db.open()
+
+'''ZODB API
+# from pydantic import BaseModel
+
+# class ZodbItem(BaseModel):
+#     key: int
+#     subj: str
+#     obj: str
+#     score: float
+#     text: str
+
+# @app.post("/zodb_insert")
+# async def zodb_insert(item: ZodbItem, db_code: str='dependency'):
+#     db = DIC_ZODB.get(db_code)
+#     key = item.key
+#     value = {'text': item.text, 'subject': item.subj, 'object': item.obj, 'score': item.score}
+#     msg = db.insert(key, value)
+#     return {'result': msg}
+
+# @app.post("/zodb_search")
+# async def zodb_search(key: int, db_code: str='dependency'):
+#     db = DIC_ZODB.get(db_code)
+#     return {'result': db.search(key)}
+'''
 
 
 def normalization(x):
@@ -67,6 +90,35 @@ async def pred(api_name: str, input1: str, input2: str=None):
     return rst
 
 
+# @app.post("/ke_insert")
+# async def ke_insert(
+#     input1: str,
+#     input2: str=None,
+#     dim: int=2048,
+#     model: str='test',
+#     db_code: str='dependency',
+#     partition_tag: str='202103',
+#     index_file_size: int=1024,
+# ):
+#     rst = main(model, input1, input2)
+
+#     text, rels = rst.get('text'), rst.get('rels')
+#     vecs, values = _get_rels(text, rels)
+
+#     ids = milvusDB.insert(
+#         vecs,
+#         dim=dim,
+#         collection_name=db_code,
+#         partition_tag=partition_tag,
+#         index_file_size=index_file_size,
+#     )
+#     milvusDB.commit()
+
+#     db = DIC_ZODB.get(db_code)
+#     msg = db.insert(ids, values)
+
+#     return {'result': msg}
+
 def search_cosine(_cosines, values, top_k=5):
     rst = []
 
@@ -74,7 +126,7 @@ def search_cosine(_cosines, values, top_k=5):
         _cosines,
         collection_name=collection_cosine,
         partition_tags=partition_tags_cosine,
-        top_k=top_k,
+        top_k=top_k
     )
     simis_cosine = [[(s.id, s.distance) for s in simi] for simi in simis_cosine]
 
@@ -84,6 +136,9 @@ def search_cosine(_cosines, values, top_k=5):
             _milvus_search_rst = db.root.dic_cosines[_id]
             _milvus_search_rst['distance'] = _distance
             _text_candidate = _milvus_search_rst.get('text')
+
+            # qqp_score = _get_qqp(text, _text_candidate)
+            # _milvus_search_rst['text_match_score'] = qqp_score
 
             _milvus_candidates.append(_milvus_search_rst)
 
@@ -97,21 +152,15 @@ def search_cosine(_cosines, values, top_k=5):
 
 def search_pairs(_vs_s, _vs_o, _cosines, values, top_k=5):
     rst = []
-    simis_subjects = milvusDB.search(
-        np.mean(np.array(_vs_s), axis=1),
-        collection_name=collection_words,
-        partition_tags=partition_tags_subjects,
-        top_k=top_k,
-    )
+    simis_subjects = milvusDB.search(np.mean(np.array(_vs_s), axis=1), collection_name=collection_words,
+                                     partition_tags=partition_tags_subjects, top_k=top_k)
     simis_subjects = [[(s.id, s.distance) for s in simi] for simi in simis_subjects]
+    simis_subjects = list(sorted(simis_subjects, key=lambda x: x[1]))
 
-    simis_objects = milvusDB.search(
-        np.mean(np.array(_vs_o), axis=1),
-        collection_name=collection_words,
-        partition_tags=partition_tags_objects,
-        top_k=top_k,
-    )
+    simis_objects = milvusDB.search(np.mean(np.array(_vs_o), axis=1), collection_name=collection_words,
+                                    partition_tags=partition_tags_objects, top_k=top_k)
     simis_objects = [[(s.id, s.distance) for s in simi] for simi in simis_objects]
+    simis_objects = list(sorted(simis_objects, key=lambda x: x[1]))
 
     all_ids_cosine = []
     for simis_subject, simis_object, _cosine, value in zip(simis_subjects, simis_objects, _cosines, values):
@@ -157,5 +206,7 @@ async def ke_search(
         rst = search_cosine(_cosines, values, top_k=top_k)
     else:
         rst = search_pairs(_vs_s, _vs_o, _cosines, values, top_k=top_k)
+        # if not len(rst):
+        #     rst = search_cosine(_cosines, values, top_k=top_k)
 
     return {'result': {'text': text, 'words': words, 'pairs': rst}}

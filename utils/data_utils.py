@@ -77,14 +77,15 @@ def rel_data_loader(fns=None):
             dic_pairs = {}
             for k in dic_rels:
                 obj_word, pos, n_rel = dic_rels.get(k).values()
-                obj_pos = (pos, pos + len(obj_word))
-                subj_word, pos, _ = dic_rels.get(str(n_rel)).values()
-                subj_pos = (pos, pos + len(subj_word))
+                if dic_rels.get(str(n_rel)):
+                    obj_pos = (pos, pos + len(obj_word))
+                    subj_word, pos, _ = dic_rels.get(str(n_rel)).values()
+                    subj_pos = (pos, pos + len(subj_word))
 
-                if subj_pos in dic_pairs:
-                    dic_pairs[subj_pos].append((obj_pos, obj_word))
-                else:
-                    dic_pairs[subj_pos] = [(obj_pos, obj_word)]
+                    if subj_pos in dic_pairs:
+                        dic_pairs[subj_pos].append((obj_pos, obj_word))
+                    else:
+                        dic_pairs[subj_pos] = [(obj_pos, obj_word)]
 
             data_x.append(text)
             data_y.append(dic_pairs)
