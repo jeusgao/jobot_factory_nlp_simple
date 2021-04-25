@@ -6,12 +6,14 @@
 from backend import keras, V_TF
 from keras_bert.layers import MaskedGlobalMaxPool1D
 
+from .graph_attention_layer import GraphAttention
 from .models import base_embed, bert_base, get_model, nonmask_embed
 from .optimizers import adam, adam_warmup, AdamEMA
 from .tokenizers import tokenizer_zh, kwr_labeler, cls_labeler
 from .callbacks import TrainingCallbacks, EvaluatingCallbacks
 from .generators import spo_data_generator_train, data_generator_train, data_generator_pred
 from .funcs import gather_words, get_square, init_truncated_normal
+from .embedding import EmbedModel
 from .layers import (
     base_inputs,
     NonMaskingLayer,

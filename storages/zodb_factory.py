@@ -20,12 +20,11 @@ class ZodbFactory(object):
         self.conn, self.root = None, None
 
         # self.open()
-        # self.close_conn()
+        # self.close()
 
     def open(self):
         self.conn = self.db.open()
         self.root = self.conn.root()
-        print(f'DB lenth: {self.root.dic_lenth()}')
 
     # def insert(self, keys, values):
     #     with self.db.transaction() as connection:
@@ -39,7 +38,7 @@ class ZodbFactory(object):
     # def search(self, key):
         # return self.root.dic_milvus[key]
 
-    def close_conn(self):
+    def close(self):
         self.conn.close()
         self.db.close()
 

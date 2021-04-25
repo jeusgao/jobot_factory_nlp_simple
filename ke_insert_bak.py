@@ -6,7 +6,6 @@
 # @Version : $Id$
 
 import os
-import time
 import atexit
 import pickle
 import argparse
@@ -49,14 +48,14 @@ db = DIC_ZODB.get(zodb_code)
 db.open()
 
 root = db.root
-root.dic_vocab = OLBTree()
 root.dic_words = LOBTree()
+root.dic_words_all = OLBTree()
 root.dic_edges = LOBTree()
-root.dic_word_edges = LOBTree()
-root.dic_pairs = OOBTree()
-root.dic_word_pairs = OOBTree()
+root.dic_pairs = LOBTree()
+root.dic_dots = LOBTree()
+root.dic_cosines = LOBTree()
 
-fn_tmp = 'tmp/tmp_'
+fn_tmp = 'tmp_'
 _C = 30000
 _c = 1024
 
@@ -73,43 +72,34 @@ def atexit_fun():
     db.close()
 
 
-def zodb_insert_words(keys, words):
-    with db.db.transaction() as connection:
-        if len(words) > 0:
-            for key, word in zip(keys, words):
-                root.dic_words[key] = word
-                root.dic_vocab[word] = key
-    return f'{len(root.dic_vocab)}, {len(root.dic_words)} words insert to ZODB. '
-
-
-def zodb_insert_rels(keys_rel, values):
+def zodb_insert(keys_rel, values, ids_word, words):
+    _count = 0
     with db.db.transaction() as connection:
         if len(values) > 0:
             for key_rel, value in zip(keys_rel, values):
-                _s, _o = value.get('subject'), value.get('object')
-                key_s, key_o = root.dic_vocab[_s], root.dic_vocab[_o]
+                root.dic_edges[key_rel] = value
 
-                root.dic_edges[key_rel] = {
-                    'subject': _s,
-                    'subject_id': key_s,
-                    'object': _o,
-                    'object_id': key_o
-                }
+        if len(words) > 0:
+            for id_word, word in zip(ids_word, words):
+                if word not in root.dic_words_all:
+                    root.dic_words[id_word] = word
+                    root.dic_words_all[word] = id_word
+                    _count += 1
 
-                if key_s in root.dic_word_edges:
-                    root.dic_word_edges[key_s].append(key_rel)
-                else:
-                    root.dic_word_edges[key_s] = [key_rel]
+    return {'msg': f'{len(keys_rel)} records and {_count} words embed insert to ZODB. '}
 
-                if key_o in root.dic_word_edges:
-                    root.dic_word_edges[key_o].append(key_rel)
-                else:
-                    root.dic_word_edges[key_o] = [key_rel]
+# def zodb_insert(values):
+#     with zoDB.transaction() as connection:
+#         for value in values:
+#             _s = value.get('subject')
+#             _o = value.get('object')
+#             _key = f'{_s}__{_o}'
+#             if _key not in root.dic_pairs:
+#                 root.dic_pairs[_key] = [value]
+#             else:
+#                 root.dic_pairs[_key].append(value)
 
-                root.dic_pairs[(key_s, key_o)] = value
-                root.dic_word_pairs[(_s, _o)] = (key_s, key_o)
-
-    return f'{len(keys_rel)} edges insert to ZODB. '
+#     return {'msg': f'{len(values)} records insert to ZODB. '}
 
 
 def zodb_commit():
@@ -117,7 +107,7 @@ def zodb_commit():
 
 
 def _get_values(ls, predictor, P):
-    VECS_s, VECS_o, VALUES, VECS_words, WORDS = [], [], [], [], []
+    VECS_s, VECS_o, VECS_words, VALUES, WORDS = [], [], [], [], []
 
     if os.path.exists(f'data/{fn_tmp}_{P}.pkl'):
         print('\nLoading vecs and values ...\n')
@@ -139,16 +129,14 @@ def _get_values(ls, predictor, P):
                 VECS_o += vecs_o
                 VALUES += values
 
-                _words_s = [v.get('subject') for v in values if v.get('subject') not in root.dic_vocab]
-                _words_o = [v.get('object') for v in values if v.get('object') not in root.dic_vocab]
-                WORDS += _words_s + _words_o
-        WORDS = list(set(WORDS))
+                _words_s = [v.get('subject') for v in values if v.get('subject') not in root.dic_words_all]
+                _words_o = [v.get('object') for v in values if v.get('object') not in root.dic_words_all]
+                _words = list(set(_words_s + _words_o))
+                WORDS += _words
 
-        print(f'WORDS Counts: {len(WORDS)}.')
-
-        s = time.time()
-        VECS_words += embed_model.get_embed(WORDS).tolist()
-        print(f'\n{len(WORDS)} words embeded costed {time.time() - s}.\n')
+        if len(WORDS) > 0:
+            WORDS = list(set(WORDS))
+            VECS_words = embed_model.get_embed(WORDS)
 
         print(f'\nDumping data/{fn_tmp}_{P}.pkl...\n')
         with open(f'data/{fn_tmp}_{P}.pkl', 'wb') as f:
@@ -169,7 +157,7 @@ def ke_insert(
     model='test',
     db_code='dependency',
     partition_tag='dot',
-    index_file_size=2048,
+    index_file_size=1024,
     new=False,
 ):
     if new:
@@ -189,45 +177,24 @@ def ke_insert(
 
     for P in tqdm(range(PAGES)):
         _start = P * _C
-
         VECS_s, VECS_o, VALUES, VECS_words, WORDS = _get_values(ls[_start:_start + _C], predictor, P)
-        print('LENTHs: Words -', len(WORDS), np.array(VECS_words).shape, 'Pairs', len(VALUES))
+        VECS_words = np.mean(VECS_words, axis=1)
+        print('LENTHs:',len(WORDS), len(VALUES))
 
-        print('\nInserting ...\n')
-        if all([len(VECS_s), len(VECS_o), len(VALUES)]):
-            _MAX = len(VECS_words)
+        if all([len(WORDS), len(VECS_words), len(VECS_s), len(VECS_o), len(VALUES)]):
+            _MAX = max(len(WORDS), len(VALUES))
             pages = _MAX // _c
             if pages * _c < _MAX:
                 pages += 1
 
+            print('\nInserting ...\n')
+            _maxlen = max(max(len(_s), len(_o)) for _s, _o in zip(VECS_s, VECS_o))
+
             for p in tqdm(range(pages)):
                 _start = p * _c
+
                 _vecs_words = VECS_words[_start:_start + _c]
                 _words = WORDS[_start:_start + _c]
-
-                ids_words = milvusDB.insert(
-                    np.mean(np.array(_vecs_words), axis=1),
-                    dim=1024,
-                    collection_name='words',
-                    index_file_size=index_file_size,
-                    metric='IP',
-                    index='HNSW',
-                )
-                print(f'\n{len(ids_words)} words insert to milvus.\n')
-
-                msg = zodb_insert_words(ids_words, _words)
-                zodb_commit()
-                print(f'\n{msg}\n')
-
-            _MAX = len(VALUES)
-            pages = _MAX // _c
-            if pages * _c < _MAX:
-                pages += 1
-
-            _maxlen = max(max(max(len(_s), len(_o)) for _s, _o in zip(VECS_s, VECS_o)), 16)
-
-            for p in tqdm(range(pages)):
-                _start = p * _c
 
                 _vecs_s = VECS_s[_start:_start + _c]
                 _vecs_o = VECS_o[_start:_start + _c]
@@ -236,25 +203,29 @@ def ke_insert(
                 print('\nMilvus inserting ...\n')
                 ids_dot = None
                 if len(_vecs_s) > 0:
-                    _vs_word_s = [VECS_words[WORDS.index(v.get('subject'))] for v in values]
-                    _vs_word_o = [VECS_words[WORDS.index(v.get('object'))] for v in values]
-                    relations = make_features(_maxlen, _vecs_s, _vecs_o, _vs_word_s, _vs_word_o)
-                    print('Relation shape:', relations.shape)
-
+                    relation, _vs_s, _vs_o = make_features(_maxlen, _vecs_s, _vecs_o)
                     ids_dot = milvusDB.insert(
-                        relations,
+                        relation,
                         dim=dim,
                         collection_name=db_code,
                         partition_tag=partition_tag,
                         index_file_size=index_file_size,
                         metric='IP',
-                        index='HNSW',
                     )
 
-                print(f'\n{len(_vecs_s)} records insert to milvus.\n')
+                ids_word = None
+                if len(_vecs_words) > 0:
+                    ids_word = milvusDB.insert(
+                        _vecs_words,
+                        dim=1024,
+                        collection_name='words',
+                        index_file_size=index_file_size,
+                        metric='L2',
+                    )
+                print(f'\n{len(_vecs_s)} records and {len(_words)} words embed insert to milvus.\n')
 
                 print('\nZODB inserting ...\n')
-                msg = zodb_insert_rels(ids_dot, _values)
+                msg = zodb_insert(ids_dot, _values, ids_word, _words)
                 zodb_commit()
 
                 print(f'\n{msg}\n')

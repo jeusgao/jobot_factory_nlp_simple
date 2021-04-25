@@ -17,6 +17,12 @@ from .func_utils import (
     get_key_from_json,
     kill_process,
     dump_json,
+    preprocess_features,
+    softmax_1d,
+    softmax,
+    attention,
+    make_features,
+    get_rels,
 )
 from .resolvers import resolve, resolve_spo
 

@@ -9,46 +9,64 @@ from milvus import Milvus, IndexType, MetricType, Status
 
 dim = 1024
 
+metrics = {
+    'L2': MetricType.L2,
+    'IP': MetricType.IP,
+}
+
+indexes = {
+    'HNSW': IndexType.HNSW,
+}
+
+params = {
+    'HNSW': {"M": 48, "efConstruction": 384},
+}
+
+search_params = {
+    'HNSW': {"ef": 16384},
+}
+
 
 class MilvusFactory(object):
     def __init__(self, host='127.0.0.1', port='9058'):
         self.db = Milvus(host, port)
 
-    def build_collection(self, collection_name='dependency', partition_tag='202103', dim=dim, index_file_size=1024):
+    def build_collection(self, collection_name='dependency', partition_tag='202103', dim=dim, index_file_size=1024, metric='IP', index='HNSW'):
         param = {
             'collection_name': collection_name,
             'dimension': dim,
             'index_file_size': index_file_size,
-            'metric_type': MetricType.IP
+            'metric_type': metrics.get(metric)
         }
         self.db.create_collection(param)
-
         self.db.create_partition(collection_name=collection_name, partition_tag=partition_tag)
-        self.db.list_partitions(collection_name=collection_name)
+        self.db.create_index(collection_name, indexes.get(index), params.get(index))
 
-        index_param = {"M": 32, "efConstruction": 256}
-        self.db.create_index(collection_name, IndexType.HNSW, index_param)
+    def drop_collection(self, collection_name):
+        self.db.drop_collection(collection_name)
 
-    def insert(self, vecs, collection_name='dependency', partition_tag='202103', dim=dim, index_file_size=1024):
+    def insert(self, vecs, collection_name='dependency', partition_tag='202103', dim=dim, index_file_size=1024, metric='IP', new=False):
         _, ok = self.db.has_collection(collection_name)
         if not ok:
             self.build_collection(
                 collection_name=collection_name,
                 partition_tag=partition_tag,
                 dim=dim,
-                index_file_size=index_file_size
+                index_file_size=index_file_size,
+                metric=metric,
             )
+
+        _, ok = self.db.has_partition(collection_name, partition_tag)
+        if not ok:
+            self.db.create_partition(collection_name=collection_name, partition_tag=partition_tag)
+
         status, ids = self.db.insert(collection_name, vecs, partition_tag=partition_tag)
         self.db.flush([collection_name])
 
         return ids
 
-    def search(self, query_vectors, collection_name='dependency', partition_tags=None, top_k=5):
-        search_param = {
-            "ef": 16384,
-            # "nprobe": 8192
-            # "search_k": top_k * 768
-        }
+    def search(self, query_vectors, collection_name='dependency', partition_tags=None, top_k=5, index='HNSW'):
+        search_param = search_params.get(index)
 
         st = time.time()
         param = {
