@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2021-03-12 14:08:32
 # @Author  : Joe Gao (jeusgao@163.com)
-# @Link    : https://www.jianshu.com/u/3b77f85cc918
-# @Version : $Id$
 
 import os
 from .components import get_default

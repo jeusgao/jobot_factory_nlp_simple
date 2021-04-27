@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2021-03-12 00:35:52
 # @Author  : Joe Gao (jeusgao@163.com)
-# @Link    : https://www.jianshu.com/u/3b77f85cc918
-# @Version : $Id$
 
 import os
 from backend import tf, keras

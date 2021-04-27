@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2021-03-11 16:18:33
 # @Author  : Joe Gao (jeusgao@163.com)
-# @Link    : https://www.jianshu.com/u/3b77f85cc918
-# @Version : $Id$
 
 import os
 from utils import get_dic_from_json

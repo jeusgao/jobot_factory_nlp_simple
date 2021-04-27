@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2021-01-29 22:41:18
 # @Author  : Joe Gao (jeusgao@163.com)
-# @Link    : https://www.jianshu.com/u/3b77f85cc918
-# @Version : $Id$
 
 import random
 import numpy as np
