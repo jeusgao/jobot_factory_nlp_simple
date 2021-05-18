@@ -8,11 +8,13 @@ from backend import tf, keras
 
 
 def gather_words(inputs):
-    output, tensor_words = inputs
+    output, tensor_words, tensor_ners = inputs
     zeros = tf.zeros((1, output.shape[-2], output.shape[-1],), dtype=tf.float32)
 
     words_ids = tf.argmax(tensor_words, axis=2, output_type=tf.int32)
-    conds = tf.expand_dims(words_ids, -1)
+    ners_ids = tf.argmax(tensor_ners, axis=2, output_type=tf.int32)
+    _ids = tf.add(words_ids, ners_ids)
+    conds = tf.expand_dims(_ids, -1)
     conds = tf.tile(conds, [1, 1, output.shape[-1]])
     tensor = tf.where(conds > 0, output, zeros)
 
